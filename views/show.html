@@ -1,6 +1,6 @@
 {% extends "pageLayout.html" %}
 
-{% include "blogMacros.html" %}
+{% include "mapMacros.html" %}
 
 {% block bodyClass %}{{ super() }} apos-blog-post-page{% endblock %}
 
@@ -16,7 +16,7 @@
 {% block main %}
   <h3><a href="{{ page.url }}">{{ page.title | e }}</a></h3>
 
-  {{ renderBlogPost(item, page.url) }}
+  {{ renderMapLocation(item, page.url) }}
 {% endblock %}
 
 {% block sidebar %}

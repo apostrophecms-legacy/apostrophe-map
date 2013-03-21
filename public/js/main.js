@@ -3,7 +3,6 @@ function AposMap(optionsArg) {
   var options = {
     instance: 'mapLocation'
   };
-  apos.log('*** I am in AposMap');
   $.extend(options, optionsArg);
   AposSnippets.call(self, options);
 
@@ -12,11 +11,8 @@ function AposMap(optionsArg) {
   };*/
 
   self.beforeInsert = function($el, data, callback) {
-    // return callback();
-    // alert(data);
-    console.log('#####################################');
-    console.log(data);
+    //grab the value of the address field and toss it into the data object before carrying on
+    data.address = $el.find('[name="address"]').val();
+    callback();
   };
-
-
 }

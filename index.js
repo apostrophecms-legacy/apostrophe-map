@@ -29,16 +29,19 @@ map.Map = function(options, callback) {
   var superDispatch = self.dispatch;
 
   self.beforeInsert = function(req, snippet, callback) {
-    // console.log('SNUPPPPPPP');
-    // console.log(snippet);
-    console.log('******* BODY *********');
-    console.log(req.body);
+    //shove the raw address into the snippet object on its way to mongo
+    var address = req.body.address;
+    snippet.address = address;
 
-
-
-    //middleware for geolocation happens here....
-
-    callback();
+    // use geocoder to generate a lat/long for the address and shove that in the snippet too
+    geocoder.geocode(address, function ( err, coords ) {
+      if(!err) {
+        snippet.coords = coords.results[0].geometry.location;
+        callback();
+      } else {
+        console.log(err);
+      }
+    });
   };
 
   /*self.beforeUpdate = function() {
