@@ -1,0 +1,29 @@
+{
+  "name": "apostrophe-map",
+  "version": "0.0.1",
+  "description": "Custom Google map generator for the Apostrophe content management system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:punkave/apostrophe-map.git"
+  },
+  "keywords": [
+    "map",
+    "apostrophe",
+    "cms",
+    "mapping",
+    "punkave"
+  ],
+  "author": "P'unk Avenue LLC",
+  "license": "MIT",
+  "dependencies": {
+    "async": "~0.2.6",
+    "underscore": "~1.4.4",
+    "extend": "~1.1.3",
+    "apostrophe-snippets":"0.0.x",
+    "geocoder": "*"
+  }
+}
