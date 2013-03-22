@@ -23,12 +23,10 @@ map.Map = function(options, callback) {
   });
 
   options.dirs = (options.dirs || []).concat([ __dirname ]);
-
   snippets.Snippets.call(this, options, null);
-
   var superDispatch = self.dispatch;
 
-  self.beforeInsert = function(req, snippet, callback) {
+  function appendAddress(req, snippet, callback) {
     //shove the raw address into the snippet object on its way to mongo
     var address = req.body.address;
     snippet.address = address;
@@ -42,16 +40,19 @@ map.Map = function(options, callback) {
         console.log(err);
       }
     });
+  }
+
+  self.beforeInsert = function(req, snippet, callback) {
+    appendAddress(req, snippet, callback);
   };
 
-  /*self.beforeUpdate = function() {
-
-  }*/
+  self.beforeUpdate = function() {
+    appendAddress(req, snippet, callback);
+  }
 
   self.dispatch = function(req, callback) {
     superDispatch.call(this, req, callback);
   };
-
 
   self.getDefaultTitle = function() {
     return 'My Location';
