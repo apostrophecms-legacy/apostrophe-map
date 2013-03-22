@@ -12,16 +12,21 @@
   <div class="apos-map-location">
     <div class="apos-map-location-heading">
       <h4><a href="{{ pageUrl }}/{{ item.publishedAt | date('YYYY/MM/DD') }}/{{ item.slug }}">{{ item.title | e }}</a></h4>
-      <h6>{{ item.publishedAt | date("MMM DD [']YY") }}</h6>
+      <h6>{{ item.address }}</h6>
     </div>
-
-    <div class="apos-map-coords">{{ item.coords.lat }} / {{ item.coords.lng }}</div>
-
   </div>
 {% endmacro %}
 
-{% macro renderGoogleMap() %}
-  <div id="map">
-    <h3>Map map map map</h3>
-  </div>
+{% macro renderGoogleMap(items) %}
+  <div id="map-canvas" style="width: 600px; height: 300px;"> </div>
+  {# load in the google maps apis #}
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA4AeSmhph6FqLD7GKnjP5aQLiySYzmuQs&sensor=false"> </script>
+  <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js" type="text/javascript"></script>  
+
+  {# instantiate a new AposGoogleMap #}
+  <script type="text/javascript">
+    window.gmap = new AposGoogleMap( {{ items | json }} );
+    //gmap.setup( {{ items | json }} );
+  </script>
+
 {% endmacro %}
