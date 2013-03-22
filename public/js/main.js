@@ -12,6 +12,11 @@ function AposMap(optionsArg) {
     callback();
   }
 
+  self.afterPopulatingEditor = function($el, snippet, callback) {
+    $el.find('[name=address]').val(snippet.address);
+    callback();
+  };
+
   self.beforeInsert = function($el, data, callback) {
     findAddress($el, data, callback);
   };
@@ -90,7 +95,7 @@ var AposGoogleMap = function(items) {
     '<div class="map-location-info">'+
       '<div class="location-content">' +
         '<h2 class="location-title">'+item.title+'</h2>' +
-        '<a class="more-button" href="'+item.slug+'">Learn More</a>' +
+        '<a class="more-button" href="'+window.location+'/'+item.slug+'">Learn More</a>' +
       '</div>' +
     '</div>';
 

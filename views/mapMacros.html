@@ -11,7 +11,7 @@
 {% macro renderMapLocation(item, pageUrl) %}
   <div class="apos-map-location">
     <div class="apos-map-location-heading">
-      <h4><a href="{{ pageUrl }}/{{ item.publishedAt | date('YYYY/MM/DD') }}/{{ item.slug }}">{{ item.title | e }}</a></h4>
+      <h4><a href="{{ pageUrl }}/{{ item.slug }}">{{ item.title | e }}</a></h4>
       <h6>{{ item.address }}</h6>
     </div>
   </div>
