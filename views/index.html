@@ -17,5 +17,7 @@
 {% endblock %}
 
 {% block sidebar %}
-  {{ renderMapLocations(items, page.url) }}
+  <ul>
+    {{ renderMapLocations(items, page.url, 'classname') }}
+  </ul>
 {% endblock %}

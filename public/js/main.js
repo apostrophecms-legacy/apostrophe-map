@@ -6,9 +6,12 @@ function AposMap(optionsArg) {
   $.extend(options, optionsArg);
   AposSnippets.call(self, options);
 
-  function findAddress($el, data, callback) {
-    //grab the value of the address field and toss it into the data object before carrying on
+  function findExtraFields($el, data, callback) {
+    //grab the value of the extra fields and toss them into the data object before carrying on
     data.address = $el.find('[name="address"]').val();
+    data.locType = $el.find('[name="type"]').val();
+    data.hours = $el.find('[name="hours"]').val();
+    data.descr = $el.find('[name="description"]').val();
     callback();
   }
 
@@ -18,37 +21,42 @@ function AposMap(optionsArg) {
   };
 
   self.beforeInsert = function($el, data, callback) {
-    findAddress($el, data, callback);
+    findExtraFields($el, data, callback);
   };
 
   self.beforeUpdate = function($el, data, callback) {
-    findAddress($el, data, callback);
+    findExtraFields($el, data, callback);
   };
 }
 
 // a meaty constructor that fires up our googlemap:
-var AposGoogleMap = function(items) {
+var AposGoogleMap = function(items, mapOptions) {
   var self = this;
   self.items = items;
+  self.mapOptions = mapOptions;
   self.markers = [];
   self.infoBoxes = [];
+  self.map;
 
   this.setup = function(callback) {
     callback();
   }
 
+  // set up the actual map
   this.googleMap = function() {
-    var mapCenter = new google.maps.LatLng(39.952335, -75.163789)
-      , mapZoom = 12
-      , mapEl = 'map-canvas';
-
-    var mapStyles;
+    var mapCenter = new google.maps.LatLng(39.952335, -75.163789);
+    var mapZoom = 12;
+    var mapEl = 'map-canvas';
 
     var map = new google.maps.Map(document.getElementById(mapEl), {
       zoom: mapZoom,
       center: mapCenter,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     });
+
+    self.map = map;
+
+    var mapStyles = self.mapOptions.styles;
 
     if(mapStyles) map.setOptions({styles:mapStyles});
 
@@ -59,7 +67,22 @@ var AposGoogleMap = function(items) {
       self.markers[i] = marker;
 
       var infoBox = self.generateInfoBox(self.items[i], map);
+      // self.infoBoxes[self.items[i]._id] = infoBox;
       self.infoBoxes[i] = infoBox;
+
+      // $('.apos-location#'+self.items[i]._id).click(function(marker, i) {
+      //   return function() {
+      //     for(b in self.infoBoxes) { self.infoBoxes[b].close(); }
+      //     infoBox.open(map, self.markers[i]);  
+      //   }
+      // })(marker, i));
+
+      $('.apos-location#'+self.items[i]._id).on('click', (function(marker, i) {
+        return function() {
+          for(b in self.infoBoxes) { self.infoBoxes[b].close(); }
+          self.infoBoxes[i].open(map, self.markers[i]);
+        }
+      })(marker, i));
 
       // attach a click listener to the marker that opens our info box
       google.maps.event.addListener(marker, 'click', (function(marker, i) {
@@ -73,16 +96,19 @@ var AposGoogleMap = function(items) {
 
   this.generateMarker = function(item, map)
   {
+    var markerHTML = document.createElement('DIV');
+        markerHTML.innerHTML = '<div class="map-marker general"></div>';
     var coords = new google.maps.LatLng(item.coords.lat, item.coords.lng);
-    var marker = new google.maps.Marker({
+
+    var marker = new RichMarker({
       position: coords,
       draggable: false,
       visible: true,
       clickable: true,
-      map: map
+      map: map,
+      content: markerHTML
     });
 
-    // icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAB5JREFUeNrswTEBAAAAwqD1T+1vBqAAAADgTQABBgAOLgABLbg5rgAAAABJRU5ErkJggg=='
     return marker;
   }
 
@@ -90,19 +116,24 @@ var AposGoogleMap = function(items) {
   {
     var boxMarkup = document.createElement("div");
 
-    //i would like this to eventually become some sort of template
+    // THIS SHOULD BECOME SOME SORT OF TEMPLATE IF POSSIBLE
+    // IT WOULD BE GREAT IF WE COULD KEEP IT IN THE VIEWS FOLDER FOR THIS MODULE
     boxMarkup.innerHTML = '' +
     '<div class="map-location-info">'+
       '<div class="location-content">' +
+        '<h5 class="location-type">'+item.locType+'</h5>' +
         '<h2 class="location-title">'+item.title+'</h2>' +
-        '<a class="more-button" href="'+window.location+'/'+item.slug+'">Learn More</a>' +
+        '<p>'+item.address+'</p>'+
+        '<p>'+item.descr+'</p>'+
+        '<p>'+item.hours+'</p>'+
+        '<a class="more-button" href="'+window.location.pathname+'/'+item.slug+'">Learn More</a>' +
       '</div>' +
     '</div>';
 
     var boxOptions = {
       content: boxMarkup,
       disableAutoPan: false,
-      pixelOffset: new google.maps.Size(30,-35),
+      pixelOffset: new google.maps.Size(30,0),
       boxStyle: {
         width: "280px"
        },
@@ -120,4 +151,11 @@ var AposGoogleMap = function(items) {
   self.setup(function() {
     google.maps.event.addDomListener(window, 'load', self.googleMap)
   });
+}
+
+AposGoogleMapSidebar = function() {
+  // $('.apos-location').each(function(){
+  //   gmap.
+  // })
+
 }

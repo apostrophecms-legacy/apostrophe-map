@@ -26,9 +26,13 @@ map.Map = function(options, callback) {
   snippets.Snippets.call(this, options, null);
   var superDispatch = self.dispatch;
 
-  function appendAddress(req, snippet, callback) {
+  function appendExtraFields(req, snippet, callback) {
     //shove the raw address into the snippet object on its way to mongo
     var address = req.body.address;
+    var type = req.body.locType;
+    var hours = req.body.hours;
+    var description = req.body.descr;
+
     snippet.address = address;
 
     // use geocoder to generate a lat/long for the address and shove that in the snippet too
@@ -43,11 +47,11 @@ map.Map = function(options, callback) {
   }
 
   self.beforeInsert = function(req, snippet, callback) {
-    appendAddress(req, snippet, callback);
+    appendExtraFields(req, snippet, callback);
   };
 
   self.beforeUpdate = function() {
-    appendAddress(req, snippet, callback);
+    appendExtraFields(req, snippet, callback);
   }
 
   self.dispatch = function(req, callback) {

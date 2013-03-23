@@ -1,33 +1,40 @@
-{% macro renderMapLocations(items, pageUrl) %}
+{% macro renderMapLocations(items, pageUrl, classname) %}
   {% if items %}
     {% for item in items %}
-      {{ renderMapLocation(item, pageUrl) }}
+      {{ renderMapLocation(item, pageUrl, classname) }}
     {% endfor %}
   {% else %}
     <h4>There are no map locations yet.</h4>
   {% endif %}
 {% endmacro %}
 
-{% macro renderMapLocation(item, pageUrl) %}
-  <div class="apos-map-location">
-    <div class="apos-map-location-heading">
-      <h4><a href="{{ pageUrl }}/{{ item.slug }}">{{ item.title | e }}</a></h4>
-      <h6>{{ item.address }}</h6>
-    </div>
-  </div>
+{% macro renderMapLocation(item, pageUrl, classname) %}
+  <li class="apos-location {{classname}}" id="{{item._id}}">
+    <!-- <a href="{{ pageUrl }}/{{ item.slug }}">{{ item.title | e }}</a> -->
+    <a>{{ item.title | e }}</a>
+  </li>
 {% endmacro %}
 
-{% macro renderGoogleMap(items) %}
-  {# create an element for the map to load in #}
-  <div id="map-canvas" style="width: 600px; height: 400px;"> </div>
+{% macro renderGoogleMap(items, options) %}
+  {# create an element for the map to load in REMEMBER TO SET THE D#}
+  {# REMEMBER TO SET THE WIDTH IN YOUR STYLESHEETS OR YOU WON'T SEE ANYTHING #}}
+  <div id="map-canvas"></div>
 
   {# load in the google maps apis #}
   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA4AeSmhph6FqLD7GKnjP5aQLiySYzmuQs&sensor=false"> </script>
   <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js" type="text/javascript"></script>  
+  <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/richmarker/src/richmarker-compiled.js"></script>
 
   {# instantiate a new AposGoogleMap #}
   <script type="text/javascript">
-    window.gmap = new AposGoogleMap( {{ items | json }} );
+    window.gmap = new AposGoogleMap({{ items | json }}, {{ options | json }});
+  </script>
+
+  <script type="text/javascript">
+    $(document).ready(function(){
+
+    })
+
   </script>
 
 {% endmacro %}

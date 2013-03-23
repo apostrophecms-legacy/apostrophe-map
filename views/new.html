@@ -9,14 +9,34 @@
 
       <fieldset>
         <label>Address</label>
-        <input name="address" type="text"></fieldset>
+        <input name="address" type="text">
       </fieldset>
 
       <fieldset>
+        <label>Location Type</label>
+        <select name="type">
+          <option value="general">General</option>
+          <option value="restaurant">Restaurant</option>
+          <option value="hotel">Hotel</option>
+        </select>
+      </fieldset>      
+
+      <fieldset>
+        <label>Hours</label>
+        <input name="hours" type="text">
+      </fieldset>
+
+      <fieldset>
+        <label>Description</label>
+        <textarea name="description" rows="4">
+      </fieldset>            
+
+
+<!--       <fieldset>
         <label>Body</label>
         {# js adds this area to the dialog #}
         <div data-body-edit-view></div>
-      </fieldset>
+      </fieldset> -->
     </form>
   </div>
   <div class="apos-modal-footer">
