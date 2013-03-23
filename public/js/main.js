@@ -9,14 +9,17 @@ function AposMap(optionsArg) {
   function findExtraFields($el, data, callback) {
     //grab the value of the extra fields and toss them into the data object before carrying on
     data.address = $el.find('[name="address"]').val();
-    data.locType = $el.find('[name="type"]').val();
+    data.locType = $el.find('[name="locType"]').val();
     data.hours = $el.find('[name="hours"]').val();
-    data.descr = $el.find('[name="description"]').val();
+    data.descr = $el.find('[name="descr"]').val();
     callback();
   }
 
   self.afterPopulatingEditor = function($el, snippet, callback) {
     $el.find('[name=address]').val(snippet.address);
+    $el.find('[name="locType"]').val(snippet.locType);
+    $el.find('[name="hours"]').val(snippet.hours);
+    $el.find('[name="descr"]').val(snippet.descr);
     callback();
   };
 
@@ -67,15 +70,7 @@ var AposGoogleMap = function(items, mapOptions) {
       self.markers[i] = marker;
 
       var infoBox = self.generateInfoBox(self.items[i], map);
-      // self.infoBoxes[self.items[i]._id] = infoBox;
       self.infoBoxes[i] = infoBox;
-
-      // $('.apos-location#'+self.items[i]._id).click(function(marker, i) {
-      //   return function() {
-      //     for(b in self.infoBoxes) { self.infoBoxes[b].close(); }
-      //     infoBox.open(map, self.markers[i]);  
-      //   }
-      // })(marker, i));
 
       $('.apos-location#'+self.items[i]._id).on('click', (function(marker, i) {
         return function() {

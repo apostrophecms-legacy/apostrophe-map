@@ -28,15 +28,13 @@ map.Map = function(options, callback) {
 
   function appendExtraFields(req, snippet, callback) {
     //shove the raw address into the snippet object on its way to mongo
-    var address = req.body.address;
-    var type = req.body.locType;
-    var hours = req.body.hours;
-    var description = req.body.descr;
-
-    snippet.address = address;
+    snippet.address = req.body.address;
+    snippet.hours = req.body.hours;
+    snippet.descr = req.body.descr;
+    snippet.locType = req.body.locType;
 
     // use geocoder to generate a lat/long for the address and shove that in the snippet too
-    geocoder.geocode(address, function ( err, coords ) {
+    geocoder.geocode(req.body.address, function ( err, coords ) {
       if(!err) {
         snippet.coords = coords.results[0].geometry.location;
         callback();
