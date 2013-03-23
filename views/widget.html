@@ -1,0 +1,5 @@
+{% for snippet in item._snippets %}
+  <h4>{{ snippet.title | e }}</h4>
+  <h6>{{ snippet.address | e }}</h6>
+  {{ aposArea({ area: snippet.areas.body }) }}
+{% endfor %}

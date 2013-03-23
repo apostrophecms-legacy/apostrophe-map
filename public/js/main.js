@@ -26,6 +26,19 @@ function AposMap(optionsArg) {
   };
 }
 
+AposMap.addWidgetType = function(options) {
+  if (!options) {
+    options = {};
+  }
+  _.defaults(options, {
+    name: 'map',
+    label: 'Locations',
+    action: '/apos-map-location',
+    defaultLimit: 5
+  });
+  AposSnippets.addWidgetType(options);
+};
+
 // a meaty constructor that fires up our googlemap:
 var AposGoogleMap = function(items) {
   var self = this;
