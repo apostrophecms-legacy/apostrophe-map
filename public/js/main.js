@@ -92,7 +92,7 @@ var AposGoogleMap = function(items, mapOptions) {
   this.generateMarker = function(item, map)
   {
     var markerHTML = document.createElement('DIV');
-        markerHTML.innerHTML = '<div class="map-marker general"></div>';
+        markerHTML.innerHTML = '<div class="map-marker '+item.locType+'"></div>';
     var coords = new google.maps.LatLng(item.coords.lat, item.coords.lng);
 
     var marker = new RichMarker({
@@ -115,6 +115,7 @@ var AposGoogleMap = function(items, mapOptions) {
     // IT WOULD BE GREAT IF WE COULD KEEP IT IN THE VIEWS FOLDER FOR THIS MODULE
     boxMarkup.innerHTML = '' +
     '<div class="map-location-info">'+
+      '<div class="location-image"></div>' +
       '<div class="location-content">' +
         '<h5 class="location-type">'+item.locType+'</h5>' +
         '<h2 class="location-title">'+item.title+'</h2>' +
@@ -128,7 +129,7 @@ var AposGoogleMap = function(items, mapOptions) {
     var boxOptions = {
       content: boxMarkup,
       disableAutoPan: false,
-      pixelOffset: new google.maps.Size(30,0),
+      pixelOffset: new google.maps.Size(40,-105),
       boxStyle: {
         width: "280px"
        },

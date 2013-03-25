@@ -9,7 +9,7 @@
 {% endmacro %}
 
 {% macro renderMapLocation(item, pageUrl, classname) %}
-  <li class="apos-location {{classname}}" id="{{item._id}}">
+  <li class="apos-location {{classname}} {{item.locType}}" id="{{item._id}}">
     <!-- <a href="{{ pageUrl }}/{{ item.slug }}">{{ item.title | e }}</a> -->
     <a>{{ item.title | e }}</a>
   </li>
@@ -29,12 +29,4 @@
   <script type="text/javascript">
     window.gmap = new AposGoogleMap({{ items | json }}, {{ options | json }});
   </script>
-
-  <script type="text/javascript">
-    $(document).ready(function(){
-
-    })
-
-  </script>
-
 {% endmacro %}
