@@ -23,6 +23,7 @@ map.Map = function(options, callback) {
   });
 
   options.dirs = (options.dirs || []).concat([ __dirname ]);
+
   snippets.Snippets.call(this, options, null);
   var superDispatch = self.dispatch;
 

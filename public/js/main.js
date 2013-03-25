@@ -32,6 +32,19 @@ function AposMap(optionsArg) {
   };
 }
 
+AposMap.addWidgetType = function(options) {
+  if (!options) {
+    options = {};
+  }
+  _.defaults(options, {
+    name: 'map',
+    label: 'Locations',
+    action: '/apos-map-location',
+    defaultLimit: 5
+  });
+  AposSnippets.addWidgetType(options);
+};
+
 // a meaty constructor that fires up our googlemap:
 var AposGoogleMap = function(items, mapOptions) {
   var self = this;
@@ -147,11 +160,4 @@ var AposGoogleMap = function(items, mapOptions) {
   self.setup(function() {
     google.maps.event.addDomListener(window, 'load', self.googleMap)
   });
-}
-
-AposGoogleMapSidebar = function() {
-  // $('.apos-location').each(function(){
-  //   gmap.
-  // })
-
 }
