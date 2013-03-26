@@ -146,7 +146,7 @@ var AposGoogleMap = function(items, mapOptions) {
     var boxOptions = {
       content: boxMarkup,
       disableAutoPan: false,
-      pixelOffset: new google.maps.Size(44,-103),
+      pixelOffset: new google.maps.Size(10,-137),
       boxStyle: {
         width: "280px"
        },
