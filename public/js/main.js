@@ -96,7 +96,11 @@ var AposGoogleMap = function(items, mapOptions) {
       google.maps.event.addListener(marker, 'click', (function(marker, i) {
         return function() {
           for(b in self.infoBoxes) { self.infoBoxes[b].close(); }
+          for(b in self.markers) {
+            self.markers[b].content.firstChild.className = self.markers[b].content.firstChild.className.replace(' active', '');
+           }
           self.infoBoxes[i].open(map, self.markers[i]);
+          marker.content.firstChild.className += " active";
         }
       })(marker, i));
     }
@@ -142,7 +146,7 @@ var AposGoogleMap = function(items, mapOptions) {
     var boxOptions = {
       content: boxMarkup,
       disableAutoPan: false,
-      pixelOffset: new google.maps.Size(40,-105),
+      pixelOffset: new google.maps.Size(44,-103),
       boxStyle: {
         width: "280px"
        },
