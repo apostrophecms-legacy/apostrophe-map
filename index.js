@@ -19,39 +19,73 @@ map.Map = function(options, callback) {
     name: options.name || 'map',
     label: options.name || 'Map',
     webAssetDir: __dirname + '/public',
-    menuName: 'aposMapMenu'
+    menuName: 'aposMapMenu',
+    locTypes: [
+      { name: 'general', label: 'General' },
+      { name: 'restaurant', label: 'Restaurant' },
+      { name: 'hotel', label: 'Hotel' }
+    ]
   });
 
   options.dirs = (options.dirs || []).concat([ __dirname ]);
 
+  self._locTypes = options.locTypes;
+
+  if (!options.rendererGlobals) {
+    options.rendererGlobals = {};
+  }
+
+  _.defaults(options.rendererGlobals, {
+    locTypes: self._locTypes
+  });
+
   snippets.Snippets.call(this, options, null);
+
   var superDispatch = self.dispatch;
 
-  function appendExtraFields(req, snippet, callback) {
+  function appendExtraFields(data, snippet, callback) {
+
     //shove the raw address into the snippet object on its way to mongo
-    snippet.address = req.body.address;
-    snippet.hours = req.body.hours;
-    snippet.descr = req.body.descr;
-    snippet.locType = req.body.locType;
+    snippet.address = data.address;
+    snippet.hours = data.hours;
+    // Tolerant of alternate names, for the importer
+    snippet.descr = data.descr || data.description;
+
+    // Tolerant of alternate names, for the importer
+    var dataLocType = data.locType || data.locationType;
+    if (!dataLocType) {
+      dataLocType = '';
+    }
+
+    // Be really tolerant of how they enter location types, for the importer
+    var locType = _.find(self._locTypes, function(locType) {
+      return ((locType.name.toLowerCase() === dataLocType.toLowerCase()) ||
+        (locType.label.toLowerCase() === dataLocType.toLowerCase()));
+    });
+    if (!locType) {
+      locType = self._locTypes[0];
+    }
+    snippet.locType = locType.name;
 
     // use geocoder to generate a lat/long for the address and shove that in the snippet too
-    geocoder.geocode(req.body.address, function ( err, coords ) {
+    geocoder.geocode(data.address, function ( err, coords ) {
       if(!err) {
         snippet.coords = coords.results[0].geometry.location;
-        callback();
+        return callback();
       } else {
         console.log(err);
+        return callback(err);
       }
     });
   }
 
-  self.beforeInsert = function(req, snippet, callback) {
-    appendExtraFields(req, snippet, callback);
+  self.beforeInsert = function(req, data, snippet, callback) {
+    appendExtraFields(data, snippet, callback);
   };
 
-  self.beforeUpdate = function() {
-    appendExtraFields(req, snippet, callback);
-  }
+  self.beforeUpdate = function(req, data, snippet, callback) {
+    appendExtraFields(data, snippet, callback);
+  };
 
   self.dispatch = function(req, callback) {
     superDispatch.call(this, req, callback);
@@ -62,4 +96,5 @@ map.Map = function(options, callback) {
   };
 
   process.nextTick(function() { return callback(null); });
-}
+};
+

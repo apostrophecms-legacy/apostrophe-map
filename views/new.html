@@ -15,11 +15,11 @@
       <fieldset>
         <label>Location Type</label>
         <select name="locType">
-          <option value="general">General</option>
-          <option value="restaurant">Restaurant</option>
-          <option value="hotel">Hotel</option>
+          {% for locType in locTypes %}
+            <option value="{{ locType.name | e }}">{{ locType.label | e }}</option>
+          {% endfor %}
         </select>
-      </fieldset>      
+      </fieldset>
 
       <fieldset>
         <label>Hours</label>
