@@ -45,23 +45,47 @@ AposMap.addWidgetType = function(options) {
   AposSnippets.addWidgetType(options);
 };
 
-// a meaty constructor that fires up our googlemap:
+// a meaty constructor that fires up our googlemap. if mapOptions.center is not
+// set to an object with lat and lng properties, the center is
+// determined from the items. If there are no items... welcome to Philadelphia!
+
 var AposGoogleMap = function(items, mapOptions) {
   var self = this;
   self.items = items;
   self.mapOptions = mapOptions;
   self.markers = [];
   self.infoBoxes = [];
-  self.map;
 
   this.setup = function(callback) {
     callback();
-  }
+  };
 
   // set up the actual map
   this.googleMap = function() {
-    var mapCenter = new google.maps.LatLng(39.952335, -75.163789);
-    var mapZoom = 12;
+    var lat = 0.0;
+    var lng = 0.0;
+    var mapCenter;
+    if (self.mapOptions.center) {
+      mapCenter = new google.maps.latLng(center.lat, center.lng);
+    }
+    if (!mapCenter) {
+      // Auto-center
+      var valid = 0;
+      _.each(self.items, function(item) {
+        if (item.coords) {
+          lat += item.coords.lat;
+          lng += item.coords.lng;
+          valid++;
+        }
+      });
+      if (valid) {
+        mapCenter = new google.maps.LatLng(lat / valid, lng / valid);
+      } else {
+        mapCenter = new google.maps.LatLng(39.952335, -75.163789);
+      }
+    }
+
+    var mapZoom = self.mapOptions.zoom;
     var mapEl = 'map-canvas';
 
     var map = new google.maps.Map(document.getElementById(mapEl), {
@@ -76,9 +100,22 @@ var AposGoogleMap = function(items, mapOptions) {
 
     if(mapStyles) map.setOptions({styles:mapStyles});
 
-    // loop through the items getting passed in from our template 
+    var bounds;
+    if (!mapZoom) {
+      // Auto-zoom
+      bounds = new google.maps.LatLngBounds();
+    }
+    // loop through the items getting passed in from our template
     // and create a marker / info box for each
-    for(i in self.items) {
+    var i;
+    for (i in self.items) {
+      var item = self.items[i];
+      if (item.coords) {
+        if (!mapZoom) {
+          // Auto-zoom
+          bounds.extend(new google.maps.LatLng(item.coords.lat, item.coords.lng));
+        }
+      }
       var marker = self.generateMarker(self.items[i], map);
       self.markers[i] = marker;
 
@@ -87,24 +124,30 @@ var AposGoogleMap = function(items, mapOptions) {
 
       $('.apos-location#'+self.items[i]._id).on('click', (function(marker, i) {
         return function() {
-          for(b in self.infoBoxes) { self.infoBoxes[b].close(); }
+          for(var b in self.infoBoxes) { self.infoBoxes[b].close(); }
           self.infoBoxes[i].open(map, self.markers[i]);
-        }
+        };
       })(marker, i));
 
       // attach a click listener to the marker that opens our info box
       google.maps.event.addListener(marker, 'click', (function(marker, i) {
         return function() {
+          var b;
           for(b in self.infoBoxes) { self.infoBoxes[b].close(); }
           for(b in self.markers) {
             self.markers[b].content.firstChild.className = self.markers[b].content.firstChild.className.replace(' active', '');
            }
           self.infoBoxes[i].open(map, self.markers[i]);
           marker.content.firstChild.className += " active";
-        }
+        };
       })(marker, i));
     }
-  }
+
+    if (!mapZoom) {
+      //Auto zoom
+      self.map.fitBounds(bounds);
+    }
+  };
 
   this.generateMarker = function(item, map)
   {
@@ -122,7 +165,7 @@ var AposGoogleMap = function(items, mapOptions) {
     });
 
     return marker;
-  }
+  };
 
   this.generateInfoBox = function(item, map)
   {
@@ -158,10 +201,11 @@ var AposGoogleMap = function(items, mapOptions) {
     };
 
     return new InfoBox(boxOptions);
-  }
+  };
 
   //call setup and feed it the google map load listener
   self.setup(function() {
-    google.maps.event.addDomListener(window, 'load', self.googleMap)
+    google.maps.event.addDomListener(window, 'load', self.googleMap);
   });
-}
+};
+

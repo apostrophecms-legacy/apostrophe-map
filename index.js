@@ -3,7 +3,7 @@ var _ = require('underscore');
 var extend = require('extend');
 var snippets = require('apostrophe-snippets');
 var util = require('util');
-var geocoder = require('geocoder');
+var geocoder = require('./geocoder.js');
 
 module.exports = map;
 
@@ -66,18 +66,19 @@ map.Map = function(options, callback) {
       locType = self._locTypes[0];
     }
     snippet.locType = locType.name;
-
-    // use geocoder to generate a lat/long for the address and shove that in the snippet too
-    geocoder.geocode(data.address, function ( err, coords ) {
-      if(!err) {
-        snippet.coords = coords.results[0].geometry.location;
-        return callback();
-      } else {
-        console.log(err);
-        return callback(err);
-      }
-    });
+    // geocoding now occurs in background as google's rate limit permits.
+    return callback(null);
   }
+
+  // Invoke from only ONE process if you are using cluster, multiple
+  // servers, etc. The idea is to avoid smacking into Google's rate limit.
+
+  self.geocoder = function(options) {
+    if (!options) {
+      options = {};
+    }
+    return geocoder(_.defaults(options, { instance: self._instance, apos: self._apos }));
+  };
 
   self.beforeInsert = function(req, data, snippet, callback) {
     appendExtraFields(data, snippet, callback);
@@ -95,6 +96,8 @@ map.Map = function(options, callback) {
     return 'My Location';
   };
 
-  process.nextTick(function() { return callback(null); });
+  process.nextTick(function() {
+    return callback(null);
+  });
 };
 
