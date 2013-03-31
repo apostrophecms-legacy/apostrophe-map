@@ -18,7 +18,7 @@ map.Map = function(options, callback) {
     instance: 'mapLocation',
     name: options.name || 'map',
     label: options.name || 'Map',
-    webAssetDir: __dirname + '/public',
+    webAssetDir: __dirname,
     menuName: 'aposMapMenu',
     locTypes: [
       { name: 'general', label: 'General' },
