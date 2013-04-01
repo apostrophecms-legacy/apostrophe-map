@@ -1,36 +1,15 @@
+{% include "mapMacros.html" %}
 <div class="apos-modal apos-template {% block class %}apos-new-map-location{% endblock %}">
-  <h3>{% block action %}New Location{% endblock %}</h3>
+  <h3>{% block label %}New Location{% endblock %}</h3>
   <div class="apos-modal-body">
     <form>
-      <fieldset>
-        <label>Title</label>
-        <input name="title" type="text" />
-      </fieldset>
-
-      <fieldset>
-        <label>Address</label>
-        <input name="address" type="text">
-      </fieldset>
-
-      <fieldset>
-        <label>Location Type</label>
-        <select name="locType">
-          {% for locType in locTypes %}
-            <option value="{{ locType.name | e }}">{{ locType.label | e }}</option>
-          {% endfor %}
-        </select>
-      </fieldset>
-
-      <fieldset>
-        <label>Hours</label>
-        <input name="hours" type="text">
-      </fieldset>
-
-      <fieldset class="apos-editor-fieldset">
-        <label>Description</label>
-        <textarea name="descr" rows="4"></textarea>
-      </fieldset>
-
+      {{ snippetText('title', 'Title') }}
+      {# Override me in edit.html to add the slug field #}
+      {% block slug %}{% endblock %}
+      {{ snippetText('address', 'Address') }}
+      {{ snippetSelect('locType', 'Location Type', locTypes) }}
+      {{ snippetText('hours', 'Hours') }}
+      {{ snippetTextarea('descr', 'Description') }}
 
 <!--       <fieldset>
         <label>Body</label>

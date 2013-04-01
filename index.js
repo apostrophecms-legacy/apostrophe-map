@@ -46,13 +46,13 @@ map.Map = function(options, callback) {
   function appendExtraFields(data, snippet, callback) {
 
     //shove the raw address into the snippet object on its way to mongo
-    snippet.address = data.address;
-    snippet.hours = data.hours;
+    snippet.address = self._apos.sanitizeString(data.address);
+    snippet.hours = self._apos.sanitizeString(data.hours);
     // Tolerant of alternate names, for the importer
-    snippet.descr = data.descr || data.description;
+    snippet.descr = self._apos.sanitizeString(data.descr || data.description);
 
     // Tolerant of alternate names, for the importer
-    var dataLocType = data.locType || data.locationType;
+    var dataLocType = self._apos.sanitizeString(data.locType || data.locationType);
     if (!dataLocType) {
       dataLocType = '';
     }
@@ -96,8 +96,10 @@ map.Map = function(options, callback) {
     return 'My Location';
   };
 
-  process.nextTick(function() {
-    return callback(null);
-  });
+  if (callback) {
+    process.nextTick(function() {
+      return callback(null);
+    });
+  }
 };
 
