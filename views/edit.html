@@ -1,50 +1,11 @@
-<div class="apos-modal apos-template apos-edit-map-location">
-  <h3 data-hint-title>Edit Location</h3>
-  <div class="apos-modal-body">
-    <form>
-      <fieldset>
-        <label>Title</label>
-        <input name="title" type="text" />
-      </fieldset>
+{% extends "new.html" %}
 
-      <fieldset>
-        <label>Slug</label>
-        <input name="slug" type="text" />
-      </fieldset>
+{% include "mapMacros.html" %}
 
-      <fieldset>
-        <label>Address</label>
-        <input name="address" type="text">
-      </fieldset>
+{% block class %}apos-edit-map-location{% endblock %}
 
-      <fieldset>
-        <label>Location Type</label>
-        <select name="locType">
-          <option value="general">General</option>
-          <option value="restaurant">Restaurant</option>
-          <option value="hotel">Hotel</option>
-        </select>
-      </fieldset>      
+{% block label %}Edit Location{% endblock %}
 
-      <fieldset>
-        <label>Hours</label>
-        <input name="hours" type="text">
-      </fieldset>
-
-      <fieldset>
-        <label>Description</label>
-        <textarea name="descr" rows="4"></textarea>
-      </fieldset> 
-
-<!--       <fieldset>
-        <label>Body</label>
-        <div data-body-edit-view></div>
-      </fieldset> -->
-    </form>
-  </div>
-  <div class="apos-modal-footer">
-    <a href="#" data-action="save" class="apos-control apos-button apos-save">Save</a>
-    <a href="#" data-action="dismiss" class="apos-control apos-button apos-cancel">Cancel</a>
-    <a href="#" data-action="delete" class="apos-control apos-button apos-delete">Delete</a>
-  </div>
-</div>
+{% block slug %}
+  {{ snippetText('slug', 'Slug') }}
+{% endblock %}

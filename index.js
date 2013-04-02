@@ -3,7 +3,7 @@ var _ = require('underscore');
 var extend = require('extend');
 var snippets = require('apostrophe-snippets');
 var util = require('util');
-var geocoder = require('geocoder');
+var geocoder = require('./geocoder.js');
 
 module.exports = map;
 
@@ -18,40 +18,75 @@ map.Map = function(options, callback) {
     instance: 'mapLocation',
     name: options.name || 'map',
     label: options.name || 'Map',
-    webAssetDir: __dirname + '/public',
-    menuName: 'aposMapMenu'
+    webAssetDir: __dirname,
+    menuName: 'aposMapMenu',
+    locTypes: [
+      { name: 'general', label: 'General' },
+      { name: 'restaurant', label: 'Restaurant' },
+      { name: 'hotel', label: 'Hotel' }
+    ]
   });
 
   options.dirs = (options.dirs || []).concat([ __dirname ]);
 
+  self._locTypes = options.locTypes;
+
+  if (!options.rendererGlobals) {
+    options.rendererGlobals = {};
+  }
+
+  _.defaults(options.rendererGlobals, {
+    locTypes: self._locTypes
+  });
+
   snippets.Snippets.call(this, options, null);
+
   var superDispatch = self.dispatch;
 
-  function appendExtraFields(req, snippet, callback) {
-    //shove the raw address into the snippet object on its way to mongo
-    snippet.address = req.body.address;
-    snippet.hours = req.body.hours;
-    snippet.descr = req.body.descr;
-    snippet.locType = req.body.locType;
+  function appendExtraFields(data, snippet, callback) {
 
-    // use geocoder to generate a lat/long for the address and shove that in the snippet too
-    geocoder.geocode(req.body.address, function ( err, coords ) {
-      if(!err) {
-        snippet.coords = coords.results[0].geometry.location;
-        callback();
-      } else {
-        console.log(err);
-      }
+    //shove the raw address into the snippet object on its way to mongo
+    snippet.address = self._apos.sanitizeString(data.address);
+    snippet.hours = self._apos.sanitizeString(data.hours);
+    // Tolerant of alternate names, for the importer
+    snippet.descr = self._apos.sanitizeString(data.descr || data.description);
+
+    // Tolerant of alternate names, for the importer
+    var dataLocType = self._apos.sanitizeString(data.locType || data.locationType);
+    if (!dataLocType) {
+      dataLocType = '';
+    }
+
+    // Be really tolerant of how they enter location types, for the importer
+    var locType = _.find(self._locTypes, function(locType) {
+      return ((locType.name.toLowerCase() === dataLocType.toLowerCase()) ||
+        (locType.label.toLowerCase() === dataLocType.toLowerCase()));
     });
+    if (!locType) {
+      locType = self._locTypes[0];
+    }
+    snippet.locType = locType.name;
+    // geocoding now occurs in background as google's rate limit permits.
+    return callback(null);
   }
 
-  self.beforeInsert = function(req, snippet, callback) {
-    appendExtraFields(req, snippet, callback);
+  // Invoke from only ONE process if you are using cluster, multiple
+  // servers, etc. The idea is to avoid smacking into Google's rate limit.
+
+  self.geocoder = function(options) {
+    if (!options) {
+      options = {};
+    }
+    return geocoder(_.defaults(options, { instance: self._instance, apos: self._apos }));
   };
 
-  self.beforeUpdate = function() {
-    appendExtraFields(req, snippet, callback);
-  }
+  self.beforeInsert = function(req, data, snippet, callback) {
+    appendExtraFields(data, snippet, callback);
+  };
+
+  self.beforeUpdate = function(req, data, snippet, callback) {
+    appendExtraFields(data, snippet, callback);
+  };
 
   self.dispatch = function(req, callback) {
     superDispatch.call(this, req, callback);
@@ -61,5 +96,10 @@ map.Map = function(options, callback) {
     return 'My Location';
   };
 
-  process.nextTick(function() { return callback(null); });
-}
+  if (callback) {
+    process.nextTick(function() {
+      return callback(null);
+    });
+  }
+};
+
