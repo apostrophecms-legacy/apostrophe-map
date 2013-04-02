@@ -20,10 +20,12 @@ map.Map = function(options, callback) {
     label: options.name || 'Map',
     webAssetDir: __dirname,
     menuName: 'aposMapMenu',
+    // locTypes are just tags that get called out for special treatment, map icons,
+    // etc. if present. This is the list of such privileged tags.
+
+    // The first loctype can be used as a default icon.
     locTypes: [
-      { name: 'general', label: 'General' },
-      { name: 'restaurant', label: 'Restaurant' },
-      { name: 'hotel', label: 'Hotel' }
+      { name: 'general', label: 'General' }
     ]
   });
 
@@ -41,6 +43,13 @@ map.Map = function(options, callback) {
 
   snippets.Snippets.call(this, options, null);
 
+  // Becomes available in browser as apos.aposMap.locTypes
+  self._apos.pushGlobalData({
+    aposMap: {
+      locTypes: self._locTypes
+    }
+  });
+
   var superDispatch = self.dispatch;
 
   function appendExtraFields(data, snippet, callback) {
@@ -51,21 +60,6 @@ map.Map = function(options, callback) {
     // Tolerant of alternate names, for the importer
     snippet.descr = self._apos.sanitizeString(data.descr || data.description);
 
-    // Tolerant of alternate names, for the importer
-    var dataLocType = self._apos.sanitizeString(data.locType || data.locationType);
-    if (!dataLocType) {
-      dataLocType = '';
-    }
-
-    // Be really tolerant of how they enter location types, for the importer
-    var locType = _.find(self._locTypes, function(locType) {
-      return ((locType.name.toLowerCase() === dataLocType.toLowerCase()) ||
-        (locType.label.toLowerCase() === dataLocType.toLowerCase()));
-    });
-    if (!locType) {
-      locType = self._locTypes[0];
-    }
-    snippet.locType = locType.name;
     // geocoding now occurs in background as google's rate limit permits.
     return callback(null);
   }

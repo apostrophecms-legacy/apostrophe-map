@@ -1,15 +1,19 @@
-function AposMap(optionsArg) {
+// Constructor name must be AposMapLocations to be
+// automatically found if instance name is mapLocation
+
+function AposMapLocations(optionsArg) {
   var self = this;
   var options = {
     instance: 'mapLocation'
   };
-  $.extend(options, optionsArg);
+  // Accept data pushed with apos.pushGlobalData() and req.pushData() as options
+  $.extend(options, apos.data.aposMap || {}, true);
+  $.extend(options, optionsArg, true);
   AposSnippets.call(self, options);
 
   function findExtraFields($el, data, callback) {
     //grab the value of the extra fields and toss them into the data object before carrying on
     data.address = $el.find('[name="address"]').val();
-    data.locType = $el.find('[name="locType"]').val();
     data.hours = $el.find('[name="hours"]').val();
     data.descr = $el.find('[name="descr"]').val();
     callback();
@@ -17,7 +21,6 @@ function AposMap(optionsArg) {
 
   self.afterPopulatingEditor = function($el, snippet, callback) {
     $el.find('[name=address]').val(snippet.address);
-    $el.find('[name="locType"]').val(snippet.locType);
     $el.find('[name="hours"]').val(snippet.hours);
     $el.find('[name="descr"]').val(snippet.descr);
     callback();
@@ -32,7 +35,7 @@ function AposMap(optionsArg) {
   };
 }
 
-AposMap.addWidgetType = function(options) {
+AposMapLocations.addWidgetType = function(options) {
   if (!options) {
     options = {};
   }
@@ -56,12 +59,12 @@ var AposGoogleMap = function(items, mapOptions) {
   self.markers = [];
   self.infoBoxes = [];
 
-  this.setup = function(callback) {
+  self.setup = function(callback) {
     callback();
   };
 
   // set up the actual map
-  this.googleMap = function() {
+  self.googleMap = function() {
     var lat = 0.0;
     var lng = 0.0;
     var mapCenter;
@@ -149,10 +152,33 @@ var AposGoogleMap = function(items, mapOptions) {
     }
   };
 
-  this.generateMarker = function(item, map)
+  // Find the locType mentioned first in the tags of the item, otherwise
+  // the first one defined, otherwise 'general'
+
+  self.getLocType = function(item) {
+    var names = _.map(self._locTypes, function(locType) { return locType.name; });
+    var locType = _.find(item.tags, function(tag) {
+      return _.has(names, tag);
+    });
+    if (!locType) {
+      locType = self._locTypes[0];
+    }
+    if (!locType) {
+      locType = { name: 'general', label: 'General' };
+    }
+    return locType;
+  };
+
+  // Return a CSS-friendly version of the locType name
+
+  self.getCssClass = function(item) {
+    return apos.cssName(self.getLocType(item));
+  };
+
+  self.generateMarker = function(item, map)
   {
     var markerHTML = document.createElement('DIV');
-        markerHTML.innerHTML = '<div class="map-marker '+item.locType+'"></div>';
+        markerHTML.innerHTML = '<div class="map-marker '+self.getCssClass(item)+'"></div>';
     var coords = new google.maps.LatLng(item.coords.lat, item.coords.lng);
 
     var marker = new RichMarker({
@@ -167,7 +193,7 @@ var AposGoogleMap = function(items, mapOptions) {
     return marker;
   };
 
-  this.generateInfoBox = function(item, map)
+  self.generateInfoBox = function(item, map)
   {
     var boxMarkup = document.createElement("div");
 
