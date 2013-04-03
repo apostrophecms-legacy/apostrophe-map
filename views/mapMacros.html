@@ -20,7 +20,12 @@
 {% macro renderGoogleMap(items, options) %}
   {# create an element for the map to load in REMEMBER TO SET THE D#}
   {# REMEMBER TO SET THE WIDTH IN YOUR STYLESHEETS OR YOU WON'T SEE ANYTHING #}}
-  <div id="map-canvas"></div>
+  {# Allow the ID to be passed in as an option. -Tom #}
+  {% set id = options.id %}
+  {% if not id %}
+    {% set id = 'apos-map-canvas' %}
+  {% endif %}
+  <div id="{{ id }}"></div>
 
   {# load in the google maps apis #}
   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA4AeSmhph6FqLD7GKnjP5aQLiySYzmuQs&sensor=false"> </script>

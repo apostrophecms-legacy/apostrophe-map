@@ -50,6 +50,8 @@ map.Map = function(options, callback) {
     }
   });
 
+  self.pushAsset('template', 'infoBox');
+
   var superDispatch = self.dispatch;
 
   function appendExtraFields(data, snippet, callback) {

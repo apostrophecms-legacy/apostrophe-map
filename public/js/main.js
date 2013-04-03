@@ -90,9 +90,9 @@ var AposGoogleMap = function(items, mapOptions) {
     }
 
     var mapZoom = self.mapOptions.zoom;
-    var mapEl = 'map-canvas';
+    var mapEl = $(mapOptions.sel || '#apos-map-canvas')[0];
 
-    var map = new google.maps.Map(document.getElementById(mapEl), {
+    var map = new google.maps.Map(mapEl, {
       zoom: mapZoom,
       center: mapCenter,
       mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -119,6 +119,9 @@ var AposGoogleMap = function(items, mapOptions) {
           // Auto-zoom
           bounds.extend(new google.maps.LatLng(item.coords.lat, item.coords.lng));
         }
+      } else {
+        // Ignore ungeocoded points
+        continue;
       }
       var marker = self.generateMarker(self.items[i], map);
       self.markers[i] = marker;
@@ -188,7 +191,7 @@ var AposGoogleMap = function(items, mapOptions) {
   self.generateMarker = function(item, map)
   {
     var markerHTML = document.createElement('DIV');
-        markerHTML.innerHTML = '<div class="map-marker '+self.getCssClass(item)+'"></div>';
+        markerHTML.innerHTML = '<div class="apos-map-marker '+self.getCssClass(item)+'"></div>';
     var coords = new google.maps.LatLng(item.coords.lat, item.coords.lng);
 
     var marker = new RichMarker({
@@ -205,25 +208,17 @@ var AposGoogleMap = function(items, mapOptions) {
 
   self.generateInfoBox = function(item, map)
   {
-    var boxMarkup = document.createElement("div");
-
-    // THIS SHOULD BECOME SOME SORT OF TEMPLATE IF POSSIBLE
-    // IT WOULD BE GREAT IF WE COULD KEEP IT IN THE VIEWS FOLDER FOR THIS MODULE
-    boxMarkup.innerHTML = '' +
-    '<div class="map-location-info">'+
-      '<div class="location-image"></div>' +
-      '<div class="location-content">' +
-        '<h5 class="location-type">'+item.locType+'</h5>' +
-        '<h2 class="location-title">'+item.title+'</h2>' +
-        '<p>'+item.address+'</p>'+
-        '<p>'+item.descr+'</p>'+
-        '<p>'+item.hours+'</p>'+
-        '<a class="more-button" href="'+window.location.pathname+'/'+item.slug+'">Learn More</a>' +
-      '</div>' +
-    '</div>';
+    var $box = apos.fromTemplate('.apos-map-location-info-box');
+    $box.find('[data-loc-type]').text(item.locType);
+    $box.find('[data-title]').text(item.title);
+    $box.find('[data-address]').text(item.address);
+    $box.find('[data-descr]').text(item.descr);
+    $box.find('[data-hours]').text(item.hours);
+    $box.find('[data-url]').attr('href', window.location.pathname + '/' + item.slug);
 
     var boxOptions = {
-      content: boxMarkup,
+      // Wants the actual DOM element, not jQuery
+      content: $box[0],
       disableAutoPan: false,
       pixelOffset: new google.maps.Size(10,-137),
       boxStyle: {
