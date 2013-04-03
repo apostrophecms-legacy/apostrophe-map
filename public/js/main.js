@@ -10,6 +10,7 @@ function AposMapLocations(optionsArg) {
   $.extend(options, apos.data.aposMap || {}, true);
   $.extend(options, optionsArg, true);
   AposSnippets.call(self, options);
+  self._locTypes = options.locTypes || [ { name: 'general', label: 'General' }];
 
   function findExtraFields($el, data, callback) {
     //grab the value of the extra fields and toss them into the data object before carrying on
@@ -156,12 +157,21 @@ var AposGoogleMap = function(items, mapOptions) {
   // the first one defined, otherwise 'general'
 
   self.getLocType = function(item) {
-    var names = _.map(self._locTypes, function(locType) { return locType.name; });
-    var locType = _.find(item.tags, function(tag) {
-      return _.has(names, tag);
+    // This information was pushed into browserland with apos.pushGlobalData
+    var locTypes = apos.data.aposMap.locTypes;
+    var locTypeTag = _.find(item.tags, function(tag) {
+      return _.find(locTypes, function(locType) {
+        return locType.name === tag;
+      });
     });
+    var locType;
+    if (locTypeTag) {
+      locType = _.find(locTypes, function(locType) {
+        return locType.name === locTypeTag;
+      });
+    }
     if (!locType) {
-      locType = self._locTypes[0];
+      locType = locTypes[0];
     }
     if (!locType) {
       locType = { name: 'general', label: 'General' };
@@ -172,7 +182,7 @@ var AposGoogleMap = function(items, mapOptions) {
   // Return a CSS-friendly version of the locType name
 
   self.getCssClass = function(item) {
-    return apos.cssName(self.getLocType(item));
+    return apos.cssName(self.getLocType(item).name);
   };
 
   self.generateMarker = function(item, map)
