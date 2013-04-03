@@ -8,7 +8,7 @@
         <input data-url="/apos-map-location/import" type="file" name="file" />
       </fieldset>
       <p>
-        This form accepts a CSV file which should have the following headings: <code>title</code>, <code>address</code>, <code>hours</code>, <code>descr</code>, <code>locType</code> and <code>tags</code>. <code>locType</code> must be one of:
+        This form accepts a CSV file which should have the following headings: <code>title</code>, <code>address</code>, <code>hours</code>, <code>descr</code>, and <code>tags</code>. The following tags display special icons (one icon per location):
 
         {% for locType in locTypes %}
           <code>{{ locType.name }}</code>
