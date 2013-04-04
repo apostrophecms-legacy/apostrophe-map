@@ -56,6 +56,7 @@ AposMapLocations.addWidgetType = function(options) {
 var AposGoogleMap = function(items, mapOptions) {
   var self = this;
   self.items = items;
+  apos.log(self.items);
   self.mapOptions = mapOptions;
   self.markers = [];
   self.infoBoxes = [];
@@ -162,7 +163,7 @@ var AposGoogleMap = function(items, mapOptions) {
   self.getLocType = function(item) {
     // This information was pushed into browserland with apos.pushGlobalData
     var locTypes = apos.data.aposMap.locTypes;
-    var locTypeTag = _.find(item.tags, function(tag) {
+    var locTypeTag = _.find(item.tags || [], function(tag) {
       return _.find(locTypes, function(locType) {
         return locType.name === tag;
       });

@@ -19,7 +19,7 @@
 
 {% macro renderGoogleMap(items, options) %}
   {# create an element for the map to load in REMEMBER TO SET THE D#}
-  {# REMEMBER TO SET THE WIDTH IN YOUR STYLESHEETS OR YOU WON'T SEE ANYTHING #}}
+  {# REMEMBER TO SET THE WIDTH IN YOUR STYLESHEETS OR YOU WON'T SEE ANYTHING #}
   {# Allow the ID to be passed in as an option. -Tom #}
   {% set id = options.id %}
   {% if not id %}
@@ -28,13 +28,8 @@
   <div id="{{ id }}"></div>
 
   {# load in the google maps apis #}
-  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA4AeSmhph6FqLD7GKnjP5aQLiySYzmuQs&sensor=false"> </script>
-  <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js" type="text/javascript"></script>  
-  <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/richmarker/src/richmarker-compiled.js"></script>
-
   {# instantiate a new AposGoogleMap #}
   <script type="text/javascript">
     window.gmap = new AposGoogleMap({{ items | json }}, {{ options | json }});
   </script>
 {% endmacro %}
-
