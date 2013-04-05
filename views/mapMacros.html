@@ -17,10 +17,7 @@
   </li>
 {% endmacro %}
 
-{% macro renderGoogleMap(items, options) %}
-  {% if not options %}
-    {% set options = {} %}
-  {% endif %}
+{% macro renderGoogleMap(items, options={}) %}
   {# create an element for the map to load in REMEMBER TO SET THE D#}
   {# REMEMBER TO SET THE WIDTH IN YOUR STYLESHEETS OR YOU WON'T SEE ANYTHING #}
   {# Allow the ID to be passed in as an option. -Tom #}
