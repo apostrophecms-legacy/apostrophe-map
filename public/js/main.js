@@ -56,7 +56,6 @@ AposMapLocations.addWidgetType = function(options) {
 var AposGoogleMap = function(items, mapOptions) {
   var self = this;
   self.items = items;
-  apos.log(self.items);
   self.mapOptions = mapOptions;
   self.markers = [];
   self.infoBoxes = [];
@@ -210,6 +209,14 @@ var AposGoogleMap = function(items, mapOptions) {
   self.generateInfoBox = function(item, map)
   {
     var $box = apos.fromTemplate('.apos-map-location-info-box');
+
+    apos.log(item.areas.thumbnail);
+    var image = apos.getFirstImage(item, 'thumbnail');
+    if (image) {
+      var url = apos.filePath(image, { size: 'one-third' });
+      apos.log(url);
+      $box.find('[data-image]').attr('src', url);
+    }
     $box.find('[data-loc-type]').text(item.locType);
     $box.find('[data-title]').text(item.title);
     $box.find('[data-address]').text(item.address);
