@@ -214,6 +214,9 @@ var AposGoogleMap = function(items, mapOptions) {
     if (image) {
       var url = apos.filePath(image, { size: 'one-third' });
       $box.find('[data-image]').attr('src', url);
+    } else {
+      // Don't show a broken image
+      $box.find('[data-image]').hide();
     }
     $box.find('[data-loc-type]').text(item.locType);
     $box.find('[data-title]').text(item.title);
