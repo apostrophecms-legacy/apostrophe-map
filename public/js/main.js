@@ -210,11 +210,9 @@ var AposGoogleMap = function(items, mapOptions) {
   {
     var $box = apos.fromTemplate('.apos-map-location-info-box');
 
-    apos.log(item.areas.thumbnail);
     var image = apos.getFirstImage(item, 'thumbnail');
     if (image) {
       var url = apos.filePath(image, { size: 'one-third' });
-      apos.log(url);
       $box.find('[data-image]').attr('src', url);
     }
     $box.find('[data-loc-type]').text(item.locType);
