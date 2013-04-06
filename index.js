@@ -18,6 +18,7 @@ map.Map = function(options, callback) {
     instance: 'mapLocation',
     name: options.name || 'map',
     label: options.name || 'Map',
+    icon: options.icon || 'map',
     webAssetDir: __dirname,
     menuName: 'aposMapMenu',
     // locTypes are just tags that get called out for special treatment, map icons,
