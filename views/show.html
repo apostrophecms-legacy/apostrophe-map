@@ -2,7 +2,7 @@
 
 {% include "mapMacros.html" %}
 
-{% block bodyClass %}{{ super() }} apos-blog-post-page{% endblock %}
+{% block bodyClass %}{{ super() }} apos-map-show{% endblock %}
 
 {% block extraBreadcrumbs %}
 <li><a href="{{ page.url }}">{{ page.title | e }}</a></li>
@@ -16,7 +16,6 @@
 {% block main %}
   <h3><a href="{{ page.url }}">{{ page.title | e }}</a></h3>
 
-  Yes.
   {{ item.slug }}
   {{ renderMapLocation(item, page.url) }}
 {% endblock %}
