@@ -17,11 +17,11 @@
   </li>
 {% endmacro %}
 
-{% macro renderGoogleMap(items, options={}) %}
+{% macro renderGoogleMap(mapItems, mapOptions={}) %}
   {# create an element for the map to load in REMEMBER TO SET THE D#}
   {# REMEMBER TO SET THE WIDTH IN YOUR STYLESHEETS OR YOU WON'T SEE ANYTHING #}
   {# Allow the ID to be passed in as an option. -Tom #}
-  {% set id = options.id %}
+  {% set id = mapOptions.id %}
   {% if not id %}
     {% set id = 'apos-map-canvas' %}
   {% endif %}
@@ -30,6 +30,6 @@
   {# load in the google maps apis #}
   {# instantiate a new AposGoogleMap #}
   <script type="text/javascript">
-    window.gmap = new AposGoogleMap({{ items | json }}, {{ options | json }});
+    window.gmap = new AposGoogleMap({{ mapItems | json }}, {{ mapOptions | json }});
   </script>
 {% endmacro %}
