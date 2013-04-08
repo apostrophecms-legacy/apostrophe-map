@@ -18,18 +18,15 @@
 {% endmacro %}
 
 {% macro renderGoogleMap(mapItems, mapOptions={}) %}
-  {# create an element for the map to load in REMEMBER TO SET THE D#}
-  {# REMEMBER TO SET THE WIDTH IN YOUR STYLESHEETS OR YOU WON'T SEE ANYTHING #}
-  {# Allow the ID to be passed in as an option. -Tom #}
-  {% set id = mapOptions.id %}
-  {% if not id %}
-    {% set id = 'apos-map-canvas' %}
-  {% endif %}
-  <div id="{{ id }}"></div>
+  {# Why can't I use ~ here? It crashes. #}
+  {% set _id = 'apos-map-canvas-' + aposGenerateId() %}
+  <div class="apos-map-canvas" id="{{ _id }}"></div>
 
   {# load in the google maps apis #}
   {# instantiate a new AposGoogleMap #}
   <script type="text/javascript">
-    window.gmap = new AposGoogleMap({{ mapItems | json }}, {{ mapOptions | json }});
+    $(function() {
+      new AposGoogleMap({{ mapItems | json }}, {{ _id | json }}, {{ mapOptions | json }});
+    });
   </script>
 {% endmacro %}

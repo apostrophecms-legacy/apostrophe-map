@@ -53,7 +53,11 @@ AposMapLocations.addWidgetType = function(options) {
 // set to an object with lat and lng properties, the center is
 // determined from the items. If there are no items... welcome to Philadelphia!
 
-var AposGoogleMap = function(items, mapOptions) {
+// id is a separate parameter because it's tough to set a property of an object
+// in a nunjucks template, and we generate the id there. You are responsible for
+// supplying a div with that id and a suitable width and height
+
+var AposGoogleMap = function(items, id, mapOptions) {
   var self = this;
   self.items = items;
   self.mapOptions = mapOptions;
@@ -90,7 +94,7 @@ var AposGoogleMap = function(items, mapOptions) {
     }
 
     var mapZoom = self.mapOptions.zoom;
-    var mapEl = $(mapOptions.sel || '#apos-map-canvas')[0];
+    var mapEl = $('#' + id)[0];
 
     var map = new google.maps.Map(mapEl, {
       zoom: mapZoom,
@@ -245,7 +249,9 @@ var AposGoogleMap = function(items, mapOptions) {
 
   //call setup and feed it the google map load listener
   self.setup(function() {
-    google.maps.event.addDomListener(window, 'load', self.googleMap);
+    $(function() {
+      self.googleMap();
+    });
   });
 };
 
