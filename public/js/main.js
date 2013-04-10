@@ -59,6 +59,7 @@ AposMapLocations.addWidgetType = function(options) {
 
 var AposGoogleMap = function(items, id, mapOptions) {
   var self = this;
+
   self.items = items;
   self.mapOptions = mapOptions;
   self.markers = [];
@@ -144,20 +145,26 @@ var AposGoogleMap = function(items, id, mapOptions) {
       google.maps.event.addListener(marker, 'click', (function(marker, i) {
         return function() {
           var b;
-          for(b in self.infoBoxes) { self.infoBoxes[b].close(); }
           for(b in self.markers) {
+            self.infoBoxes[b].close();
             self.markers[b].content.firstChild.className = self.markers[b].content.firstChild.className.replace(' active', '');
            }
           self.infoBoxes[i].open(map, self.markers[i]);
           marker.content.firstChild.className += " active";
         };
       })(marker, i));
+
+
     }
 
     if (!mapZoom) {
       //Auto zoom
       self.map.fitBounds(bounds);
     }
+
+    //expose the markers so we can get at them later for filtering and such
+    window.mapInfoBoxes = self.infoBoxes;
+    window.mapMarkers = self.markers;
   };
 
   // Find the locType mentioned first in the tags of the item, otherwise
@@ -206,6 +213,8 @@ var AposGoogleMap = function(items, id, mapOptions) {
       map: map,
       content: markerHTML
     });
+
+    marker.locTypes = item.tags;
 
     return marker;
   };

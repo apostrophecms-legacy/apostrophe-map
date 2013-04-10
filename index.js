@@ -86,7 +86,10 @@ map.Map = function(options, callback) {
   };
 
   self.dispatch = function(req, callback) {
-    superDispatch.call(this, req, callback);
+    self._apos.pages.distinct("tags", {"type":"mapLocation"}, function(err, tags){
+      req.extras.allTags = tags;
+      superDispatch.call(this, req, callback);
+    });
   };
 
   self.getDefaultTitle = function() {
