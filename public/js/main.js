@@ -109,6 +109,8 @@ var AposGoogleMap = function(items, id, mapOptions) {
 
     if(mapStyles) map.setOptions({styles:mapStyles});
 
+    map.setOptions({scrollwheel: false, mapTypeControl: false})
+
     var bounds;
     if (!mapZoom) {
       // Auto-zoom
