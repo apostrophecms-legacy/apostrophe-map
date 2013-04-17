@@ -63,8 +63,9 @@ map.Map = function(options, callback) {
     // Tolerant of alternate names, for the importer
     snippet.descr = self._apos.sanitizeString(data.descr || data.description);
 
-    // geocoding now occurs in background as google's rate limit permits.
-    return callback(null);
+    self.geocoder.geocodeSnippet(snippet, false, function() {
+      return callback(null);
+    });
   }
 
   var superAddDiffLines = self.addDiffLines;
@@ -83,14 +84,17 @@ map.Map = function(options, callback) {
     }
   };
 
+  self.geocoder = null;
+
   // Invoke from only ONE process if you are using cluster, multiple
   // servers, etc. The idea is to avoid smacking into Google's rate limit.
 
-  self.geocoder = function(options) {
+  self.startGeocoder = function(options) {
     if (!options) {
       options = {};
     }
-    return geocoder(_.defaults(options, { instance: self._instance, apos: self._apos }));
+    self.geocoder = geocoder(_.defaults(options, { instance: self._instance, apos: self._apos }));
+    return self.geocoder;
   };
 
   self.beforeInsert = function(req, data, snippet, callback) {

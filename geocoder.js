@@ -23,7 +23,7 @@ function Geocoder(options) {
   // of Google's API permit.
 
   self.geocodePass = function() {
-    self._apos.pages.find({ type: self._instance, coords: { $exists: false } },
+    self._apos.pages.find({ type: self._instance, $or: [{ coords: { $exists: false }}, { coords: null } ] },
       { address: 1 }).limit(self._rateLimit).toArray(function(err, snippets) {
       // Use eachSeries to avoid parallelism, the rate limiter below should in theory
       // make this not a problem but I've seen Google get grumpy
@@ -37,26 +37,39 @@ function Geocoder(options) {
         // have to resolve that with something in the background
         dayLimiter.removeTokens(1, function() {
           secondLimiter.removeTokens(1, function() {
-            geocoder.geocode(snippet.address, function ( err, coords ) {
-              self._geocoding = false;
-              if (!err) {
-                if (coords.status === 'OVER_QUERY_LIMIT') {
-                  // Try again later
-                  return callback();
-                } else {
-                  snippet.coords = coords.results[0].geometry.location;
-                }
-              } else {
-                // Explicitly false so we know it's not a geocodable address
-                snippet.coords = false;
-              }
-              self._apos.pages.update({ _id: snippet._id }, { $set: { coords: snippet.coords } }, function(err) {
-                // If it didn't work, it'll come up in the next query
-                return callback();
-              });
-            });
+            return self.geocodeSnippet(snippet, true, callback);
           });
         });
+      }
+    });
+  };
+
+  // Available to be called individually, for instance for manual edits where
+  // it is unlikely the rate limit will be reached
+  self.geocodeSnippet = function(snippet, saveNow, callback) {
+    geocoder.geocode(snippet.address, function ( err, coords ) {
+      if (!err) {
+        if (coords.status === 'OVER_QUERY_LIMIT') {
+          // Try again later
+          snippet.coords = null;
+          return callback();
+        } else if (coords.status === 'ZERO_RESULTS') {
+          // Explicitly false so we know it's not a geolocatable address
+          snippet.coords = false;
+        } else {
+          snippet.coords = coords.results[0].geometry.location;
+        }
+      } else {
+        // This is an error at the http or node level. Try again later
+        snippet.coords = null;
+      }
+      if (saveNow) {
+        self._apos.pages.update({ _id: snippet._id }, { $set: { coords: snippet.coords } }, function(err) {
+          // If it didn't work, it'll come up in the next query
+          return callback();
+        });
+      } else {
+        return callback();
       }
     });
   };
