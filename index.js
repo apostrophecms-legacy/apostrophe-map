@@ -67,6 +67,22 @@ map.Map = function(options, callback) {
     return callback(null);
   }
 
+  var superAddDiffLines = self.addDiffLines;
+
+  // Make sure our custom fields are included in version diffs
+  self.addDiffLines = function(snippet, lines) {
+    superAddDiffLines(snippet, lines);
+    if (snippet.address) {
+      lines.push('address: ' + snippet.address);
+    }
+    if (snippet.hours) {
+      lines.push('hours: ' + snippet.hours);
+    }
+    if (snippet.descr) {
+      lines.push('description: ' + snippet.descr);
+    }
+  };
+
   // Invoke from only ONE process if you are using cluster, multiple
   // servers, etc. The idea is to avoid smacking into Google's rate limit.
 
