@@ -240,7 +240,9 @@ var AposGoogleMap = function(items, id, mapOptions) {
     $box.find('[data-address]').text(item.address);
     $box.find('[data-descr]').text(item.descr);
     $box.find('[data-hours]').text(item.hours);
-    $box.find('[data-url]').attr('href', item.url);
+    if (item.url) {
+      $box.find('[data-url]').attr('href', item.url);
+    }
 
     var boxOptions = {
       // Wants the actual DOM element, not jQuery
