@@ -75,7 +75,8 @@ var AposGoogleMap = function(items, id, mapOptions) {
     var lng = 0.0;
     var mapCenter;
     if (self.mapOptions.center) {
-      mapCenter = new google.maps.latLng(center.lat, center.lng);
+      var center = self.mapOptions.center;
+      mapCenter = new google.maps.LatLng(center.lat, center.lng);
     }
     if (!mapCenter) {
       // Auto-center
