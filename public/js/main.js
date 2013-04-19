@@ -222,6 +222,12 @@ var AposGoogleMap = function(items, id, mapOptions) {
     return marker;
   };
 
+  // IMPORTANT: if you want more properties to be visible here, make sure
+  // you override the aposMapPruneLocations function to include them.
+  // You can do that in your server-side extension of the map module.
+  // See map/index.js for the original. Pruning is necessary to avoid
+  // sending a zillion megabytes per page to the browser
+
   self.generateInfoBox = function(item, map)
   {
     var $box = apos.fromTemplate('.apos-map-location-info-box');
