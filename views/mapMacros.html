@@ -11,8 +11,8 @@
 {% endmacro %}
 
 {% macro renderMapLocation(item, pageUrl, classname) %}
-  <li class="apos-location {{classname}} {% for tag in item.tags %} {{ tag | replace(' ','-') }}{% endfor %}" id="{{item._id}}">
-    <a href="{{ item.url }}">{{ item.title | e }}</a>
+  <li class="apos-location {{classname}} {% for tag in item.tags %} {{ tag | replace(' ','-') }}{% endfor %}" data-location-id="{{item._id}}">
+    <a href="#">{{ item.title | e }}</a>
   </li>
 {% endmacro %}
 

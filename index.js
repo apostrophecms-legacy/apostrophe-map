@@ -116,12 +116,11 @@ map.Map = function(options, callback) {
     return 'My Location';
   };
 
-  console.log('ADDING LOCAL');
   // Prunes map locations for use in the actual map. Sending all the data
   // produces a huge HTML document
   self._apos.addLocal('aposPruneMapLocations', function(locations) {
     return _.map(locations, function(location) {
-      location = _.pick(location, 'areas', 'title', 'tags', 'address', 'descr', 'hours', 'url', 'coords');
+      location = _.pick(location, '_id', 'slug', 'areas', 'title', 'tags', 'address', 'descr', 'hours', 'url', 'coords');
       if (location.areas) {
         location.areas = { thumbnail: location.areas.thumbnail };
       }

@@ -110,17 +110,24 @@ var AposGoogleMap = function(items, id, mapOptions) {
 
     if(mapStyles) map.setOptions({styles:mapStyles});
 
-    map.setOptions({scrollwheel: false, mapTypeControl: false})
+    map.setOptions({scrollwheel: false, mapTypeControl: false});
 
     var bounds;
     if (!mapZoom) {
       // Auto-zoom
       bounds = new google.maps.LatLngBounds();
     }
+
     // loop through the items getting passed in from our template
-    // and create a marker / info box for each
+    // and create a marker / info box for each. To avoid convoluted
+    // code just call a nested function in a loop and pass it 'i' so that
+    // it's safe to write boring, simple event handlers there that use 'i'
     var i;
     for (i in self.items) {
+      setUpItem(i);
+    }
+
+    function setUpItem(i) {
       var item = self.items[i];
       if (item.coords) {
         if (!mapZoom) {
@@ -129,35 +136,20 @@ var AposGoogleMap = function(items, id, mapOptions) {
         }
       } else {
         // Ignore ungeocoded points
-        continue;
+        return;
       }
-      var marker = self.generateMarker(self.items[i], map);
+      var marker = self.generateMarker(self.items[i], self.map);
       self.markers[i] = marker;
 
-      var infoBox = self.generateInfoBox(self.items[i], map);
-      self.infoBoxes[i] = infoBox;
-
-      $('.apos-location#'+self.items[i]._id).on('click', (function(marker, i) {
-        return function() {
-          for(var b in self.infoBoxes) { self.infoBoxes[b].close(); }
-          self.infoBoxes[i].open(map, self.markers[i]);
-        };
-      })(marker, i));
-
+      var selector = '.apos-location[data-location-id="' + self.items[i]._id + '"]';
+      $('.apos-location[data-location-id="' + self.items[i]._id + '"]').click(function() {
+        self.activateInfoBox(i);
+        return false;
+      });
       // attach a click listener to the marker that opens our info box
-      google.maps.event.addListener(marker, 'click', (function(marker, i) {
-        return function() {
-          var b;
-          for(b in self.markers) {
-            self.infoBoxes[b].close();
-            self.markers[b].content.firstChild.className = self.markers[b].content.firstChild.className.replace(' active', '');
-           }
-          self.infoBoxes[i].open(map, self.markers[i]);
-          marker.content.firstChild.className += " active";
-        };
-      })(marker, i));
-
-
+      google.maps.event.addListener(marker, 'click', function() {
+        self.activateInfoBox(i);
+      });
     }
 
     if (!mapZoom) {
@@ -168,6 +160,22 @@ var AposGoogleMap = function(items, id, mapOptions) {
     //expose the markers so we can get at them later for filtering and such
     window.mapInfoBoxes = self.infoBoxes;
     window.mapMarkers = self.markers;
+  };
+
+  self.activateInfoBox = function(i) {
+    var b;
+    for (b in self.markers) {
+      if (self.infoBoxes[b]) {
+        self.infoBoxes[b].close();
+      }
+      self.markers[b].content.firstChild.className = self.markers[b].content.firstChild.className.replace(' active', '');
+    }
+    if (!self.infoBoxes[i]) {
+      var infoBox = self.generateInfoBox(self.items[i], self.map);
+      self.infoBoxes[i] = infoBox;
+    }
+    self.infoBoxes[i].open(self.map, self.markers[i]);
+    self.markers[i].content.firstChild.className += " active";
   };
 
   // Find the locType mentioned first in the tags of the item, otherwise
