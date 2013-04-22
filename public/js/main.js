@@ -226,7 +226,6 @@ var AposGoogleMap = function(items, id, mapOptions) {
     });
 
     marker.locTypes = item.tags;
-
     return marker;
   };
 

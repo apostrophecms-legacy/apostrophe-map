@@ -84,6 +84,12 @@ map.Map = function(options, callback) {
     }
   };
 
+  var superAddSearchTexts = self.addSearchTexts;
+
+  self.addSearchTexts = function(snippet, texts) {
+    texts.push({ weight: 20, text: snippet.descr });
+  };
+
   self.geocoder = null;
 
   // Invoke from only ONE process if you are using cluster, multiple
