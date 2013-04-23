@@ -235,8 +235,7 @@ var AposGoogleMap = function(items, id, mapOptions) {
   // See map/index.js for the original. Pruning is necessary to avoid
   // sending a zillion megabytes per page to the browser
 
-  self.generateInfoBox = function(item, map)
-  {
+  self.generateInfoBox = function(item, map) {
     var $box = apos.fromTemplate('.apos-map-location-info-box');
 
     var image = apos.getFirstImage(item, 'thumbnail');
@@ -255,7 +254,7 @@ var AposGoogleMap = function(items, id, mapOptions) {
     $box.find('[data-hours]').text(item.hours);
     if (item.url) {
       $box.find('[data-url]').attr('href', item.url);
-
+    }
     var boxOptions = {
       // Wants the actual DOM element, not jQuery
       content: $box[0],
