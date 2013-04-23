@@ -59,6 +59,8 @@ AposMapLocations.addWidgetType = function(options) {
 
 var AposGoogleMap = function(items, id, mapOptions) {
   var self = this;
+  // For points not geocoded server side
+  var geocoder = new google.maps.Geocoder();
 
   self.items = items;
   self.mapOptions = mapOptions;
@@ -69,100 +71,142 @@ var AposGoogleMap = function(items, id, mapOptions) {
     callback();
   };
 
-  // set up the actual map
+  // set up the actual map. This works asynchronously if needed to
+  // geocode addresses browser-side
+
   self.googleMap = function() {
-    var lat = 0.0;
-    var lng = 0.0;
-    var mapCenter;
-    if (self.mapOptions.center) {
-      var center = self.mapOptions.center;
-      mapCenter = new google.maps.LatLng(center.lat, center.lng);
-    }
-    if (!mapCenter) {
-      // Auto-center
-      var valid = 0;
-      _.each(self.items, function(item) {
-        if (item.coords) {
-          lat += item.coords.lat;
-          lng += item.coords.lng;
-          valid++;
-        }
-      });
-      if (valid) {
-        mapCenter = new google.maps.LatLng(lat / valid, lng / valid);
-      } else {
-        mapCenter = new google.maps.LatLng(39.952335, -75.163789);
-      }
-    }
 
-    var mapZoom = self.mapOptions.zoom;
-    var mapEl = $('#' + id)[0];
-
-    var map = new google.maps.Map(mapEl, {
-      zoom: mapZoom,
-      center: mapCenter,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    });
-
-    self.map = map;
-
-    var mapStyles = self.mapOptions.styles;
-
-    if(mapStyles) map.setOptions({styles:mapStyles});
-
-    map.setOptions({scrollwheel: false, mapTypeControl: false});
-
-    var bounds;
-    if (!mapZoom) {
-      // Auto-zoom
-      bounds = new google.maps.LatLngBounds();
-    }
-
-    // loop through the items getting passed in from our template
-    // and create a marker / info box for each. To avoid convoluted
-    // code just call a nested function in a loop and pass it 'i' so that
-    // it's safe to write boring, simple event handlers there that use 'i'
-    var i;
-    for (i in self.items) {
-      setUpItem(i);
-    }
-
-    function setUpItem(i) {
+    // Geocode an item if needed
+    function geocodeOne(i, callback) {
       var item = self.items[i];
-      if (item.coords) {
-        if (!mapZoom) {
-          // Auto-zoom
-          bounds.extend(new google.maps.LatLng(item.coords.lat, item.coords.lng));
-        }
+      if ((!item.coords) && (item.address)) {
+        geocoder.geocode( { 'address': self.items[i].address }, function(results, status) {
+          if (status == google.maps.GeocoderStatus.OK) {
+            item.coords = { lat: results[0].geometry.location.lat(), lng: results[0].geometry.location.lng() };
+            return callback();
+          } else {
+            return callback();
+          }
+        });
       } else {
-        // Ignore ungeocoded points
-        return;
+        return callback();
       }
-      var marker = self.generateMarker(self.items[i], self.map);
-      self.markers[i] = marker;
+    }
 
-      var selector = '.apos-location[data-location-id="' + self.items[i]._id + '"]';
-      $('.apos-location[data-location-id="' + self.items[i]._id + '"]').click(function() {
-        self.activateInfoBox(i);
-        return false;
-      });
-      // attach a click listener to the marker that opens our info box
-      google.maps.event.addListener(marker, 'click', function() {
-        self.activateInfoBox(i);
+    // Simple async for loop to geocode them all, then invoke 'go'
+    var i = 0;
+    function geocodeNext() {
+      if (i >= self.items.length) {
+        return go();
+      }
+      return geocodeOne(i, function() {
+        i++;
+        return geocodeNext();
       });
     }
 
-    if (!mapZoom) {
-      //Auto zoom
-      self.map.fitBounds(bounds);
-    }
+    geocodeNext();
 
-    //expose the markers so we can get at them later for filtering and such
-    window.mapInfoBoxes = self.infoBoxes;
-    window.mapMarkers = self.markers;
+    // Called once we're ready with all of our points
+    function go() {
+      var lat = 0.0;
+      var lng = 0.0;
+      var mapCenter;
+      if (self.mapOptions.center) {
+        var center = self.mapOptions.center;
+        mapCenter = new google.maps.LatLng(center.lat, center.lng);
+      }
+      if (!mapCenter) {
+        // Auto-center
+        var valid = 0;
+        _.each(self.items, function(item) {
+          if (item.coords) {
+            lat += item.coords.lat;
+            lng += item.coords.lng;
+            valid++;
+          }
+        });
+        if (valid) {
+          mapCenter = new google.maps.LatLng(lat / valid, lng / valid);
+        } else {
+          mapCenter = new google.maps.LatLng(39.952335, -75.163789);
+        }
+      }
+
+      var mapZoom = self.mapOptions.zoom;
+      var mapEl = $('#' + id)[0];
+
+      var map = new google.maps.Map(mapEl, {
+        zoom: mapZoom,
+        center: mapCenter,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      });
+
+      self.map = map;
+
+      var mapStyles = self.mapOptions.styles;
+
+      if(mapStyles) map.setOptions({styles:mapStyles});
+
+      map.setOptions({scrollwheel: false, mapTypeControl: false});
+
+      var bounds;
+      if (!mapZoom) {
+        // Auto-zoom
+        bounds = new google.maps.LatLngBounds();
+      }
+
+      // loop through the items getting passed in from our template
+      // and create a marker / info box for each. To avoid convoluted
+      // code just call a nested function in a loop and pass it 'i' so that
+      // it's safe to write boring, simple event handlers there that use 'i'
+      var i;
+      for (i in self.items) {
+        setUpItem(i);
+      }
+
+      function setUpItem(i) {
+        var item = self.items[i];
+        if (item.coords) {
+          if (!mapZoom) {
+            // Auto-zoom
+            bounds.extend(new google.maps.LatLng(item.coords.lat, item.coords.lng));
+          }
+        } else {
+          // Ignore ungeocoded points
+          return;
+        }
+        var marker = self.generateMarker(self.items[i], self.map);
+        self.markers[i] = marker;
+
+        var selector = '.apos-location[data-location-id="' + self.items[i]._id + '"]';
+        $('.apos-location[data-location-id="' + self.items[i]._id + '"]').click(function() {
+          self.activateInfoBox(i);
+          return false;
+        });
+        // attach a click listener to the marker that opens our info box
+        google.maps.event.addListener(marker, 'click', function() {
+          self.activateInfoBox(i);
+        });
+      }
+
+      if (!mapZoom) {
+        //Auto zoom
+        self.map.fitBounds(bounds);
+      }
+
+      //expose the markers so we can get at them later for filtering and such
+      window.mapInfoBoxes = self.infoBoxes;
+      window.mapMarkers = self.markers;
+    }
   };
 
   self.activateInfoBox = function(i) {
+    if (!self.items[i].areas) {
+      // No info boxes for items without rich content, such as those
+      // supplied for a plain street address associated with an event
+      return;
+    }
     var b;
     for (b in self.markers) {
       if (self.infoBoxes[b]) {
@@ -255,6 +299,7 @@ var AposGoogleMap = function(items, id, mapOptions) {
     if (item.url) {
       $box.find('[data-url]').attr('href', item.url);
     }
+
     var boxOptions = {
       // Wants the actual DOM element, not jQuery
       content: $box[0],
