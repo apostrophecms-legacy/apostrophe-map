@@ -185,9 +185,11 @@ var AposGoogleMap = function(items, id, mapOptions) {
           return false;
         });
         // attach a click listener to the marker that opens our info box
-        google.maps.event.addListener(marker, 'click', function() {
-          self.activateInfoBox(i);
-        });
+        if (!mapOptions.noBox) {
+          google.maps.event.addListener(marker, 'click', function() {
+            self.activateInfoBox(i);
+          });
+        }
       }
 
       if (!mapZoom) {
