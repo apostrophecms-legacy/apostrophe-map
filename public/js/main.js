@@ -253,7 +253,9 @@ var AposGoogleMap = function(items, id, mapOptions) {
     $box.find('[data-title]').text(item.title);
     $box.find('[data-address]').text(item.address);
     $box.find('[data-descr]').text(item.descr);
-    $box.find('[data-hours]').text(item.hours);
+    if (item.hours) {
+      $box.find('[data-hours]').text(item.hours);
+    }
     if (item.url) {
       $box.find('[data-url]').attr('href', item.url);
     }
