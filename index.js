@@ -112,7 +112,12 @@ map.Map = function(options, callback) {
   };
 
   self.dispatch = function(req, callback) {
-    self._apos.pages.distinct("tags", {"type":"mapLocation"}, function(err, tags){
+    var criteria = { type: 'mapLocation' };
+    // Limit the query for distinct tags to tags that this page is interested in
+    if (req.page.typeSettings.tags.length) {
+      criteria.tags = { $in: req.page.typeSettings.tags };
+    }
+    self._apos.pages.distinct("tags", criteria, function(err, tags){
       req.extras.allTags = tags;
       superDispatch.call(this, req, callback);
     });
