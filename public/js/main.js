@@ -281,11 +281,6 @@ var AposGoogleMap = function(items, id, mapOptions) {
         }
       }
 
-      if (!mapZoom) {
-        //Auto zoom
-        self.map.fitBounds(bounds);
-      }
-
       // Create a jQuery event that can be used to filter by
       // a particular tag or 'all'
       $(mapEl).on('filter', function(e, filterBy) {
