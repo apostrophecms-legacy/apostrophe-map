@@ -176,6 +176,7 @@ var AposGoogleMap = function(items, id, mapOptions) {
   self.items = items;
   self.mapOptions = mapOptions;
 
+  // Why is this useful? (It's called once but just invokes its callback.)
   self.setup = function(callback) {
     callback();
   };
