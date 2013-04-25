@@ -17,7 +17,6 @@
 {% endmacro %}
 
 {% macro renderGoogleMap(mapItems, mapOptions={}) %}
-  {# Why can't I use ~ here? It crashes. #}
   {% set _id = 'apos-map-canvas-' + aposGenerateId() %}
   <div class="apos-map-canvas" id="{{ _id }}"></div>
 
