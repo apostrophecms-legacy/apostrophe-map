@@ -12,7 +12,9 @@
 
 {% macro renderMapLocation(item, pageUrl, classname) %}
   <li class="apos-location {{classname}} {% for tag in item.tags %} {{ tag | replace(' ','-') }}{% endfor %}" data-location-id="{{item._id}}">
-    <a href="#">{{ item.title | e }}</a>
+    {# Even if you plan to override this link with javascript, it still #}
+    {# must exist, otherwise your maps are not Google-friendly. -Tom #}
+    <a href="{{ item.url }}">{{ item.title | e }}</a>
   </li>
 {% endmacro %}
 
