@@ -347,7 +347,15 @@ var AposGoogleMap = function(items, id, mapOptions) {
   {
     var markerHTML = document.createElement('DIV');
         markerHTML.innerHTML = '<div class="apos-map-marker '+self.getCssClass(item)+'"></div>';
-    var coords = new google.maps.LatLng(item.coords.lat, item.coords.lng);
+
+    var coords;
+    // If the address is already a coordinate pair ignore any geocoding result and use it directly
+    if (item.address.match(/^[\-\+0-9\.\,\ ]+$/)) {
+      var rawCoords = item.address.split(/,\s*/);
+      coords = new google.maps.LatLng(parseFloat(rawCoords[0]), parseFloat(rawCoords[1]));
+    } else {
+      coords = new google.maps.LatLng(item.coords.lat, item.coords.lng);
+    }
 
     var marker = new RichMarker({
       position: coords,
@@ -382,7 +390,13 @@ var AposGoogleMap = function(items, id, mapOptions) {
     }
     $box.find('[data-loc-type]').text(item.locType);
     $box.find('[data-title]').text(item.title);
-    $box.find('[data-address]').text(item.address);
+    // Do not show the "address" if it is actually a lat,long coordinate pair
+    var $address = $box.find('[data-address]');
+    if (!item.address.match(/^[\-\+0-9\.\,\ ]+$/)) {
+      $address.text(item.address);
+    } else {
+      $address.hide();
+    }
     $box.find('[data-descr]').text(item.descr);
     // $box.find('[data-hours]').text(item.hours);
     if (item.url) {
