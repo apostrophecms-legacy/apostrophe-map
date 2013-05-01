@@ -59,8 +59,13 @@ AposMapLocations.addWidgetType = function(options) {
 
 var AposGoogleMap = function(items, id, mapOptions) {
   var self = this;
+
   // For points not geocoded server side
   var geocoder = new google.maps.Geocoder();
+
+  var mapZoom;
+  var mapCenter;
+
   self.filterBy = mapOptions.filterBy || 'all';
 
   function filter(filterBy) {
@@ -221,13 +226,12 @@ var AposGoogleMap = function(items, id, mapOptions) {
     function go() {
       var lat = 0.0;
       var lng = 0.0;
-      var mapCenter;
       if (self.mapOptions.center) {
         var center = self.mapOptions.center;
         mapCenter = new google.maps.LatLng(center.lat, center.lng);
       }
 
-      var mapZoom = self.mapOptions.zoom;
+      mapZoom = self.mapOptions.zoom;
       var $mapEl = $('#' + id);
       // For easier targeting
       $mapEl.addClass('apos-map');
