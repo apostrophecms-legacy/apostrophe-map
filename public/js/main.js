@@ -4,7 +4,8 @@
 function AposMapLocations(optionsArg) {
   var self = this;
   var options = {
-    instance: 'mapLocation'
+    instance: 'mapLocation',
+    name: 'map'
   };
   // Accept data pushed with apos.pushGlobalData() and req.pushData() as options
   $.extend(options, apos.data.aposMap || {}, true);
