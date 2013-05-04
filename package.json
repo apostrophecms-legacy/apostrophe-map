@@ -1,6 +1,6 @@
 {
   "name": "apostrophe-map",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "Custom Google map generator for the Apostrophe content management system",
   "main": "index.js",
   "scripts": {
