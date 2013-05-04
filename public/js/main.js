@@ -1,7 +1,4 @@
-// Constructor name must be AposMapLocations to be
-// automatically found if instance name is mapLocation
-
-function AposMapLocations(optionsArg) {
+function AposMap(optionsArg) {
   var self = this;
   var options = {
     instance: 'mapLocation',
@@ -37,7 +34,7 @@ function AposMapLocations(optionsArg) {
   };
 }
 
-AposMapLocations.addWidgetType = function(options) {
+AposMap.addWidgetType = function(options) {
   if (!options) {
     options = {};
   }
