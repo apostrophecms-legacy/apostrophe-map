@@ -19,7 +19,6 @@ map.Map = function(options, callback) {
     name: options.name || 'map',
     label: options.name || 'Map',
     icon: options.icon || 'map',
-    webAssetDir: __dirname,
     menuName: 'aposMapMenu',
     // locTypes are just tags that get called out for special treatment, map icons,
     // etc. if present. This is the list of such privileged tags.
@@ -30,7 +29,7 @@ map.Map = function(options, callback) {
     ]
   });
 
-  options.dirs = (options.dirs || []).concat([ __dirname ]);
+  options.modules = (options.modules || []).concat([ { dir: __dirname, name: 'map' } ]);
 
   self._locTypes = options.locTypes;
 

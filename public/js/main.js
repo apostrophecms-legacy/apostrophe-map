@@ -41,7 +41,7 @@ AposMap.addWidgetType = function(options) {
   _.defaults(options, {
     name: 'map',
     label: 'Locations',
-    action: '/apos-map-location',
+    action: '/apos-map',
     defaultLimit: 5
   });
   AposSnippets.addWidgetType(options);
