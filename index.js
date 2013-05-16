@@ -26,7 +26,11 @@ map.Map = function(options, callback) {
     // The first loctype can be used as a default icon.
     locTypes: [
       { name: 'general', label: 'General' }
-    ]
+    ],
+    // Effectively shut off pagination.
+    //
+    // Beyond this number we'd hit issues with google maps in any case
+    perPage: 1000
   });
 
   options.modules = (options.modules || []).concat([ { dir: __dirname, name: 'map' } ]);
@@ -110,17 +114,7 @@ map.Map = function(options, callback) {
     appendExtraFields(data, snippet, callback);
   };
 
-  self.dispatch = function(req, callback) {
-    var criteria = { type: 'mapLocation' };
-    // Limit the query for distinct tags to tags that this page is interested in
-    if (req.page.typeSettings.tags.length) {
-      criteria.tags = { $in: req.page.typeSettings.tags };
-    }
-    self._apos.pages.distinct("tags", criteria, function(err, tags){
-      req.extras.allTags = tags;
-      superDispatch.call(this, req, callback);
-    });
-  };
+  // Default dispatcher is good for our needs, don't reinvent the wheel
 
   self.getDefaultTitle = function() {
     return 'My Location';
