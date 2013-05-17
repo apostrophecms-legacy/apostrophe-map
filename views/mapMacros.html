@@ -14,7 +14,8 @@
   <li class="apos-location {{classname}} {% for tag in item.tags %} {{ tag | replace(' ','-') }}{% endfor %}" data-location-id="{{item._id}}">
     {# Even if you plan to override this link with javascript, it still #}
     {# must exist, otherwise your maps are not Google-friendly. -Tom #}
-    <a href="{{ item.url }}">{{ item.title | e }}</a>
+    <a class="apos-location-list-title" href="{{ item.url }}">{{ item.title | e }}</a>
+    <div class="apos-location-list-description">{{ item.descr }}</div>
   </li>
 {% endmacro %}
 

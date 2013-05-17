@@ -1,4 +1,4 @@
-{% extends "pageLayout.html" %}
+{% extends "layout.html" %}
 
 {% include "mapMacros.html" %}
 
@@ -13,11 +13,37 @@
 {% endblock %}
 
 {% block main %}
-  {{ renderGoogleMap(items) }}
+  {{ renderGoogleMap(items, { markerOptions: { clickable: false }, styles: [
+      {
+        "stylers": [
+          { "gamma": 0.88 },
+          { "saturation": -45 },
+          { "hue": "#00b2ff" }
+        ]
+      },{
+        "featureType": "road.highway",
+        "elementType": "geometry.fill",
+        "stylers": [ { "color": "#5e919a" } ]
+      },{
+        "featureType": "road.arterial",
+        "elementType": "geometry.fill",
+        "stylers": [ { "color": "#b4cfb5" } ]
+      },{
+        "featureType": "road",
+        "elementType": "labels.text.stroke",
+        "stylers": [ { "color": "#ffffff" } ]
+      }
+    ]}
+  ) }}
+  {{ super() }}
 {% endblock %}
 
-{% block sidebar %}
-  <ul>
-    {{ renderMapLocations(items, page.url, 'classname') }}
+
+{% block mainContent %}
+  <div class="map-content-area">
+    {{ aposArea({ slug: slug + ":content", area: page.areas.content, edit:edit }) }}
+  </div>
+  <ul class="map-locations">
+    {{ renderMapLocations(items, page.url, 'map-location') }}
   </ul>
 {% endblock %}
