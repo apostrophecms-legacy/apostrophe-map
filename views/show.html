@@ -12,6 +12,6 @@
 {% block mainContent %}
   <div class="apos-map-page-title"><h3><a href="{{ page.url }}">{{ page.title | e }}</a></h3></div>
   <div class="map-locations">
-    {{ renderMapLocation(item, page.url, 'map-location map-show-page') }}
+    {{ renderMapLocationWithDetails(item, page.url, 'map-location map-show-page') }}
   </div>
 {% endblock %}

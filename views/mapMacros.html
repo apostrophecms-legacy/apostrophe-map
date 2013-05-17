@@ -31,3 +31,24 @@
     });
   </script>
 {% endmacro %}
+
+
+{# let's show off all the stuff we can hold in a map item #}
+
+{% macro renderMapLocationWithDetails(item, pageUrl, classname) %}
+  <li class="apos-location {{classname}} {% for tag in item.tags %} {{ tag | replace(' ','-') }}{% endfor %}" data-location-id="{{item._id}}">
+    {# Even if you plan to override this link with javascript, it still #}
+    {# must exist, otherwise your maps are not Google-friendly. -Tom #}
+    <a class="apos-location-list-title" href="{{ item.url }}">{{ item.title | e }}</a>
+    <div class="apos-location-list-description">{{ item.descr }}</div>
+
+    <div class="apos-location-list-title">Address</div>
+    <div class="apos-location-list-description">{{ item.address }}</div>
+
+    <div class="apos-location-list-title">Coordinates</div>
+    <div class="apos-location-list-description">{{ item.coords.lat }}, {{ item.coords.lng }}</div>
+
+    <div class="apos-location-list-title">Created On</div>
+    <div class="apos-location-list-description">{{ item.createdAt }}</div>
+  </li>
+{% endmacro %}
