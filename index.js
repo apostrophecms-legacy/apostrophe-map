@@ -54,7 +54,7 @@ map.Map = function(options, callback) {
     }
   });
 
-  self.pushAsset('template', 'infoBox');
+  self.pushAsset('template', 'infoBox', { when: 'always' });
 
   var superDispatch = self.dispatch;
 
