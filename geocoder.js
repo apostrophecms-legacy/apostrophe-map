@@ -27,7 +27,7 @@ function Geocoder(options) {
       { address: 1 }).limit(self._rateLimit).toArray(function(err, snippets) {
       // Use eachSeries to avoid parallelism, the rate limiter below should in theory
       // make this not a problem but I've seen Google get grumpy
-      async.eachSeries(snippets, geocodeSnippet, function(err) {
+      async.eachSeries(snippets || [], geocodeSnippet, function(err) {
         setTimeout(self.geocodePass, 1000.0);
       });
 
