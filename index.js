@@ -56,8 +56,6 @@ map.Map = function(options, callback) {
 
   self.pushAsset('template', 'infoBox', { when: 'always' });
 
-  var superDispatch = self.dispatch;
-
   function appendExtraFields(data, snippet, callback) {
 
     //shove the raw address into the snippet object on its way to mongo
