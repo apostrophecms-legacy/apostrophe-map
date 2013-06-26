@@ -8,8 +8,7 @@
       {% block slug %}{% endblock %}
       {{ snippetText('address', 'Address') }}
       {{ snippetText('tags', 'Tags') }}
-      {# TODO macroize this as snippetBoolean #}
-      {{ snippetSelect('published', 'Published', [ { name: '0', label: 'No' }, { name: '1', label: 'Yes' }]) }}
+      {{ snippetBoolean('published', 'Published') }}
       {# The real work for these is in main.js, just get placeholders into the form #}
       {{ snippetSingleton('thumbnail', 'Thumbnail') }}
       {{ snippetSelect('locType', 'Location Type', locTypes) }}
