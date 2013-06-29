@@ -25,7 +25,7 @@ map.Map = function(options, callback) {
 
     // The first loctype can be used as a default icon.
     locTypes: [
-      { name: 'general', label: 'General' }
+      { value: 'general', label: 'General' }
     ],
     // Effectively shut off pagination.
     //
