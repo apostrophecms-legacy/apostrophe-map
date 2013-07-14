@@ -1,4 +1,7 @@
-// a meaty constructor that fires up our googlemap. if mapOptions.center is not
+// JavaScript which enables display of this module's content
+// to logged-out users belongs here.
+
+// Create Google Map that displays the specified items. Uf mapOptions.center is not
 // set to an object with lat and lng properties, the center is
 // determined from the items. If there are no items... welcome to Philadelphia!
 
