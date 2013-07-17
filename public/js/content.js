@@ -275,20 +275,20 @@ var AposGoogleMap = function(items, id, mapOptions) {
     var locTypes = apos.data.aposMap.locTypes;
     var locTypeTag = _.find(item.tags || [], function(tag) {
       return _.find(locTypes, function(locType) {
-        return locType.name === tag;
+        return locType.value === tag;
       });
     });
     var locType;
     if (locTypeTag) {
       locType = _.find(locTypes, function(locType) {
-        return locType.name === locTypeTag;
+        return locType.value === locTypeTag;
       });
     }
     if (!locType) {
       locType = locTypes[0];
     }
     if (!locType) {
-      locType = { name: 'general', label: 'General' };
+      locType = { value: 'general', label: 'General' };
     }
     return locType;
   };
@@ -296,7 +296,7 @@ var AposGoogleMap = function(items, id, mapOptions) {
   // Return a CSS-friendly version of the locType name
 
   self.getCssClass = function(item) {
-    return apos.cssName(self.getLocType(item).name);
+    return apos.cssName(self.getLocType(item).value);
   };
 
   self.generateMarker = function(item, map)
