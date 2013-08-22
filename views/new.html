@@ -7,6 +7,9 @@
       {# Override me in edit.html to add the slug field #}
       {% block slug %}{% endblock %}
       {{ snippetText('address', 'Address') }}
+      <p><strong>Optional.</strong> Leave blank for automatic geocoding.</p>
+      {{ snippetText('lat', 'Latitude') }}
+      {{ snippetText('lng', 'Longitude') }}
       {{ snippetTags('tags', 'Tags') }}
       {{ snippetBoolean('published', 'Published') }}
       {# The real work for these is in main.js, just get placeholders into the form #}

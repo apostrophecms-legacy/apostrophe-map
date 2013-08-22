@@ -20,16 +20,6 @@ map.Map = function(options, callback) {
     label: options.name || 'Map',
     icon: options.icon || 'map',
     menuName: 'aposMapMenu',
-    addFields: [
-      {
-        name: 'address',
-        type: 'string'
-      },
-      {
-        name: 'hours',
-        type: 'string'
-      }
-    ],
     // locTypes are just tags that get called out for special treatment, map icons,
     // etc. if present. This is the list of such privileged tags.
 
@@ -42,6 +32,30 @@ map.Map = function(options, callback) {
     // Beyond this number we'd hit issues with google maps in any case
     perPage: 1000
   });
+
+  // You must be careful to concatenate with fields passed in by
+  // those subclassing yours, if any! _.defaults is not good enough
+  // for addFields
+  options.addFields = [
+    {
+      name: 'address',
+      type: 'string'
+    },
+    {
+      name: 'hours',
+      type: 'string'
+    },
+    {
+      name: 'lat',
+      type: 'float',
+      def: null
+    },
+    {
+      name: 'lng',
+      type: 'float',
+      def: null
+    }
+  ].concat(options.addFields || []);
 
   options.modules = (options.modules || []).concat([ { dir: __dirname, name: 'map' } ]);
 

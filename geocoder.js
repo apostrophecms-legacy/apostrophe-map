@@ -47,31 +47,44 @@ function Geocoder(options) {
   // Available to be called individually, for instance for manual edits where
   // it is unlikely the rate limit will be reached
   self.geocodeSnippet = function(snippet, saveNow, callback) {
-    geocoder.geocode(snippet.address, function ( err, coords ) {
-      if (!err) {
-        if (coords.status === 'OVER_QUERY_LIMIT') {
-          // Try again later
-          snippet.coords = null;
-          return callback();
-        } else if (coords.status === 'ZERO_RESULTS') {
-          // Explicitly false so we know it's not a geolocatable address
-          snippet.coords = false;
-        } else {
-          snippet.coords = coords.results[0].geometry.location;
+    return async.series({
+      geocode: function(callback) {
+        // If a manually entered location is present, let it win
+        if ((typeof(snippet.lat) === 'number') && (typeof(snippet.lng) === 'number')) {
+          snippet.coords = { lat: snippet.lat, lng: snippet.lng };
+          return callback(null);
         }
-      } else {
-        // This is an error at the http or node level. Try again later
-        snippet.coords = null;
-      }
-      if (saveNow) {
-        self._apos.pages.update({ _id: snippet._id }, { $set: { coords: snippet.coords } }, function(err) {
-          // If it didn't work, it'll come up in the next query
-          return callback();
+        return geocoder.geocode(snippet.address, function ( err, coords ) {
+          if (!err) {
+            if (coords.status === 'OVER_QUERY_LIMIT') {
+              // Try again later
+              snippet.coords = null;
+              return callback();
+            } else if (coords.status === 'ZERO_RESULTS') {
+              // Explicitly false so we know it's not a geolocatable address
+              snippet.coords = false;
+            } else {
+              snippet.coords = coords.results[0].geometry.location;
+            }
+          } else {
+            // This is an error at the http or node level. Try again later
+            snippet.coords = null;
+          }
+          return callback(null);
         });
-      } else {
-        return callback();
+      },
+      save: function(callback) {
+        if (saveNow) {
+          self._apos.pages.update({ _id: snippet._id }, { $set: { coords: snippet.coords } }, function(err) {
+            // If it didn't work, it'll come up in the next query,
+            // no need to report the error now
+            return callback(null);
+          });
+        } else {
+          return callback(null);
+        }
       }
-    });
+    }, callback);
   };
 
   self.geocodePass();
