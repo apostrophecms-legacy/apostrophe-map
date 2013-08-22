@@ -190,11 +190,35 @@ var AposGoogleMap = function(items, id, mapOptions) {
       var mapEl = $mapEl[0];
 
       // reasonable defaults for zoom and center until autoZoom or autoCenter can run
+      var zoom = mapZoom || 12;
+
+      var teaser = self.mapOptions.teaser;
       var map = new google.maps.Map(mapEl, {
-        zoom: mapZoom || 12,
+        minZoom: teaser ? zoom : 0,
+        maxZoom: teaser ? zoom : 100,
+        zoom: zoom,
+        panControl: !teaser,
+        zoomControl: !teaser,
+        scaleControl: !teaser,
+        draggable: !teaser,
+        streetViewControl: !teaser,
         center: mapCenter || new google.maps.LatLng(39.952335, -75.163789),
         mapTypeId: google.maps.MapTypeId.ROADMAP
       });
+
+      if (self.mapOptions.teaser) {
+        $(mapEl).css('cursor', 'pointer');
+      }
+
+      // teaser option: this display of the map is just a teaser to take
+      // you to a more suitable page. Helps avoid overhead and scrolling
+      // frustration when a map is full width on the homepage
+      if (self.mapOptions.teaser) {
+        google.maps.event.addListener(map, 'click', function() {
+          // document.body.style.cursor = 'wait';
+          window.location.href = self.mapOptions.teaser;
+        });
+      }
 
       self.map = map;
 
@@ -231,7 +255,7 @@ var AposGoogleMap = function(items, id, mapOptions) {
           return false;
         });
         // attach a click listener to the marker that opens our info box
-        if (!mapOptions.noBox) {
+        if ((!mapOptions.teaser) && (!mapOptions.noBox)) {
           google.maps.event.addListener(item.marker, 'click', function() {
             self.activateInfoBox(item);
           });
