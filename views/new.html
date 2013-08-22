@@ -7,13 +7,13 @@
       {# Override me in edit.html to add the slug field #}
       {% block slug %}{% endblock %}
       {{ snippetText('address', 'Address') }}
-      {{ snippetText('tags', 'Tags') }}
+      {{ snippetTags('tags', 'Tags') }}
       {{ snippetBoolean('published', 'Published') }}
       {# The real work for these is in main.js, just get placeholders into the form #}
       {{ snippetSingleton('thumbnail', 'Thumbnail') }}
       {{ snippetSelect('locType', 'Location Type', locTypes) }}
       {{ snippetText('hours', 'Hours') }}
-      {{ snippetTextarea('descr', 'Description') }}
+      {{ snippetArea('body', 'Description') }}
     </form>
   </div>
   {% block buttons %}

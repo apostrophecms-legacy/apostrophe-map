@@ -20,6 +20,16 @@ map.Map = function(options, callback) {
     label: options.name || 'Map',
     icon: options.icon || 'map',
     menuName: 'aposMapMenu',
+    addFields: [
+      {
+        name: 'address',
+        type: 'string'
+      },
+      {
+        name: 'hours',
+        type: 'string'
+      }
+    ],
     // locTypes are just tags that get called out for special treatment, map icons,
     // etc. if present. This is the list of such privileged tags.
 
@@ -56,19 +66,6 @@ map.Map = function(options, callback) {
 
   self.pushAsset('template', 'infoBox', { when: 'always' });
 
-  function appendExtraFields(data, snippet, callback) {
-
-    //shove the raw address into the snippet object on its way to mongo
-    snippet.address = self._apos.sanitizeString(data.address);
-    snippet.hours = self._apos.sanitizeString(data.hours);
-    // Tolerant of alternate names, for the importer
-    snippet.descr = self._apos.sanitizeString(data.descr || data.description);
-
-    self.geocoder.geocodeSnippet(snippet, false, function() {
-      return callback(null);
-    });
-  }
-
   var superAddDiffLines = self.addDiffLines;
 
   // Make sure our custom fields are included in version diffs
@@ -104,12 +101,13 @@ map.Map = function(options, callback) {
     return self.geocoder;
   };
 
-  self.beforeInsert = function(req, data, snippet, callback) {
-    appendExtraFields(data, snippet, callback);
-  };
-
-  self.beforeUpdate = function(req, data, snippet, callback) {
-    appendExtraFields(data, snippet, callback);
+  self.beforeSave = function(req, data, snippet, callback) {
+    // descr is a denormalized copy of the plaintext part of the body area,
+    // for legacy template support and for lightweight display in map boxes
+    snippet.descr = self._apos.getAreaPlaintext({ area: snippet.areas.body });
+    self.geocoder.geocodeSnippet(snippet, false, function() {
+      return callback(null);
+    });
   };
 
   // Default dispatcher is good for our needs, don't reinvent the wheel
@@ -122,7 +120,7 @@ map.Map = function(options, callback) {
   // produces a huge HTML document
   self._apos.addLocal('aposPruneMapLocations', function(locations) {
     return _.map(locations, function(location) {
-      location = _.pick(location, '_id', 'slug', 'areas', 'title', 'tags', 'address', 'descr', 'hours', 'url', 'coords');
+      location = _.pick(location, '_id', 'slug', 'areas', 'title', 'tags', 'address', 'hours', 'url', 'coords', 'descr');
       if (location.areas) {
         location.areas = { thumbnail: location.areas.thumbnail };
       }
