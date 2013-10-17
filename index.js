@@ -30,7 +30,8 @@ map.Map = function(options, callback) {
     // Effectively shut off pagination.
     //
     // Beyond this number we'd hit issues with google maps in any case
-    perPage: 1000
+    perPage: 1000,
+    startGeocoder: true
   });
 
   // You must be careful to concatenate with fields passed in by
@@ -108,6 +109,10 @@ map.Map = function(options, callback) {
   // servers, etc. The idea is to avoid smacking into Google's rate limit.
 
   self.startGeocoder = function(options) {
+    if (self.geocoder) {
+      // Gracefully ignore redundant starts for bc
+      return;
+    }
     if (!options) {
       options = {};
     }
@@ -144,8 +149,14 @@ map.Map = function(options, callback) {
 
   if (callback) {
     process.nextTick(function() {
+      // Start the geocoder on next tick, so that it can be
+      // overridden in subclasses
+      if (options.startGeocoder !== false) {
+        self.startGeocoder();
+      }
       return callback(null);
     });
   }
+
 };
 
