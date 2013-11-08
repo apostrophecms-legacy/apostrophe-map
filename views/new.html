@@ -1,24 +1,61 @@
 {% include "mapMacros.html" %}
-<div class="apos-modal apos-template {% block class %}apos-new-map-location{% endblock %}">
+<div class="apos-modal apos-template apos-ui {% block class %}apos-new-map-location{% endblock %}">
   <h3>{% block label %}New Location{% endblock %}</h3>
-  <div class="apos-modal-body">
-    <form>
-      {{ snippetText('title', 'Title') }}
-      {# Override me in edit.html to add the slug field #}
-      {% block slug %}{% endblock %}
-      {{ snippetText('address', 'Address') }}
-      <p><strong>Optional.</strong> Leave blank for automatic geocoding.</p>
-      {{ snippetText('lat', 'Latitude') }}
-      {{ snippetText('lng', 'Longitude') }}
-      {{ snippetTags('tags', 'Tags') }}
-      {{ snippetBoolean('published', 'Published') }}
-      {# The real work for these is in main.js, just get placeholders into the form #}
-      {{ snippetSingleton('thumbnail', 'Thumbnail') }}
-      {{ snippetSelect('locType', 'Location Type', locTypes) }}
-      {{ snippetText('hours', 'Hours') }}
-      {{ snippetArea('body', 'Description') }}
-    </form>
-  </div>
+  <form>
+    <div class="apos-modal-header">
+      <div class="apos-modal-header-label">
+        Title
+      </div>
+      <div class="apos-title-and-slug">
+        {{ snippetText('title', 'Title') }}
+        {% block slug %}{% endblock %}
+      </div>
+    </div>
+
+    <div class="apos-modal-body">
+      <div class="apos-modal-tabs">
+        <div class="apos-modal-tab-control">
+          <div class="apos-modal-tab-title apos-active" data-tab="basics">Basics <i class="icon-list"></i></div>
+          <div class="apos-modal-tab-title" data-tab="tags">Tags <i class="icon-tags"></i></div>
+          <div class="apos-modal-tab-title" data-tab="thumbnail">Thumbnail <i class="icon-picture"></i></div>
+          <div class="apos-modal-tab-title" data-tab="description">Description</div>
+        </div>
+
+        <div class="apos-modal-tab apos-active" data-tab-id="basics" >
+          <div class="apos-modal-tab-content">
+            {{ snippetText('address', 'Address') }}
+
+            {# lat and lng are commented out for now.
+            most people dont need to enter map location by coordinate #}
+            {#{ snippetText('lat', 'Latitude') }}
+            {{ snippetText('lng', 'Longitude') }#}
+
+            {{ snippetText('hours', 'Hours') }}
+            {{ snippetSelect('locType', 'Location Type', locTypes) }}
+            {{ snippetBoolean('published', 'Published') }}
+          </div>
+        </div>
+
+        <div class="apos-modal-tab" data-tab-id="tags" >
+          <div class="apos-modal-tab-content">
+            {{ snippetTags('tags', 'Tags') }}
+          </div>
+        </div>
+
+        <div class="apos-modal-tab" data-tab-id="thumbnail" >
+          <div class="apos-modal-tab-content">
+            {{ snippetSingleton('thumbnail', 'Thumbnail') }}
+          </div>
+        </div>
+
+        <div class="apos-modal-tab" data-tab-id="description" >
+          <div class="apos-modal-tab-content">
+            {{ snippetArea('body', 'Description') }}
+          </div>
+        </div>
+      </div> 
+    </div>
+  </form>
   {% block buttons %}
   {{ snippetNewButtons() }}
   {% endblock %}
