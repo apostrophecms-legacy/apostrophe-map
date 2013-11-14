@@ -17,7 +17,9 @@ map.Map = function(options, callback) {
   _.defaults(options, {
     instance: 'mapLocation',
     name: options.name || 'map',
-    label: options.name || 'Map',
+    label: options.label || 'Map',
+    instanceLabel: options.instanceLabel || 'Location',
+    pluralLabel: options.pluralLabel || 'Locations',
     icon: options.icon || 'map',
     menuName: 'aposMapMenu',
     // locTypes are just tags that get called out for special treatment, map icons,
@@ -40,21 +42,27 @@ map.Map = function(options, callback) {
   options.addFields = [
     {
       name: 'address',
+      label: 'Address',
       type: 'string'
     },
     {
       name: 'hours',
+      label: 'Hours',
       type: 'string'
     },
     {
       name: 'lat',
+      label: 'Latitude',
       type: 'float',
-      def: null
+      def: null,
+      help: 'Optional. Determined automatically from address if not supplied.'
     },
     {
       name: 'lng',
+      label: 'Longitude',
       type: 'float',
-      def: null
+      def: null,
+      help: 'Optional. Determined automatically from address if not supplied.'
     }
   ].concat(options.addFields || []);
 
