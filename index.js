@@ -66,6 +66,10 @@ map.Map = function(options, callback) {
     }
   ].concat(options.addFields || []);
 
+  options.removeFields = [
+    'hideTitle'
+  ].concat(options.removeFields);
+
   options.modules = (options.modules || []).concat([ { dir: __dirname, name: 'map' } ]);
 
   self._locTypes = options.locTypes;
@@ -130,7 +134,7 @@ map.Map = function(options, callback) {
 
   self.beforeSave = function(req, data, snippet, callback) {
     // descr is a denormalized copy of the plaintext part of the body area,
-    // for legacy template support and for lightweight display in map boxes
+    // for lightweight display in map boxes
     snippet.descr = self._apos.getAreaPlaintext({ area: snippet.areas.body });
     self.geocoder.geocodeSnippet(snippet, false, function() {
       return callback(null);
@@ -138,10 +142,6 @@ map.Map = function(options, callback) {
   };
 
   // Default dispatcher is good for our needs, don't reinvent the wheel
-
-  self.getDefaultTitle = function() {
-    return 'My Location';
-  };
 
   // Prunes map locations for use in the actual map. Sending all the data
   // produces a huge HTML document
