@@ -155,13 +155,16 @@ map.Map = function(options, callback) {
     });
   });
 
-  if (callback) {
+  if (options.startGeocoder !== false) {
     process.nextTick(function() {
       // Start the geocoder on next tick, so that it can be
       // overridden in subclasses
-      if (options.startGeocoder !== false) {
-        self.startGeocoder();
-      }
+      self.startGeocoder();
+    });
+  }
+
+  if (callback) {
+    process.nextTick(function() {
       return callback(null);
     });
   }
