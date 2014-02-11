@@ -64,7 +64,12 @@ function Geocoder(options) {
               // Explicitly false so we know it's not a geolocatable address
               snippet.coords = false;
             } else {
-              snippet.coords = coords.results[0].geometry.location;
+              if (coords.results && coords.results[0]) {
+                snippet.coords = coords.results[0].geometry.location;
+              } else {
+                // What the heck Google
+                snippet.coords = null;
+              }
             }
           } else {
             // This is an error at the http or node level. Try again later
