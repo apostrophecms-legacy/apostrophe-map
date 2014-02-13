@@ -23,8 +23,10 @@ function Geocoder(options) {
   // of Google's API permit.
 
   self.geocodePass = function() {
-    self._apos.pages.find({ type: self._instance, $or: [{ coords: { $exists: false }}, { coords: null } ] },
-      { address: 1 }).limit(self._rateLimit).toArray(function(err, snippets) {
+    // Make sure an address exists, otherwise the geocode module will complain in a way
+    // that sticks us in a loop trying again with that bad location forever
+    self._apos.pages.find({ type: self._instance, address: { $exists: true, $ne: '' }, $or: [{ coords: { $exists: false }}, { coords: null } ] },
+      { title: 1, address: 1 }).limit(self._rateLimit).toArray(function(err, snippets) {
       // Use eachSeries to avoid parallelism, the rate limiter below should in theory
       // make this not a problem but I've seen Google get grumpy
       async.eachSeries(snippets || [], geocodeSnippet, function(err) {
