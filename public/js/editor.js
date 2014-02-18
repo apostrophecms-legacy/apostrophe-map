@@ -36,17 +36,3 @@ function AposMap(optionsArg) {
   };
 }
 
-AposMap.addWidgetType = function(options) {
-  if (!options) {
-    options = {};
-  }
-  _.defaults(options, {
-    name: 'map',
-    label: 'Locations',
-    action: '/apos-map',
-    defaultLimit: 5
-  });
-  AposSnippets.addWidgetType(options);
-};
-
-
