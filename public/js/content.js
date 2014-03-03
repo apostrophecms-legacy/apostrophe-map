@@ -275,7 +275,7 @@ var AposGoogleMap = function(items, id, mapOptions) {
   };
 
   self.activateInfoBox = function(item) {
-    if (!item.areas) {
+    if (!item.descr) {
       // No info boxes for items without rich content, such as those
       // supplied for a plain street address associated with an event
       return;
