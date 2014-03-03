@@ -10,6 +10,10 @@
 // supplying a div with that id and a suitable width and height
 
 var AposGoogleMap = function(items, id, mapOptions) {
+  if (!window.google) {
+    apos.log('google maps is not available in the build! Maybe you are running with offline: true in local.js, in which case this is normal.');
+    return;
+  }
   var self = this;
 
   // For points not geocoded server side
