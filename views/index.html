@@ -41,7 +41,7 @@
 
 {% block mainContent %}
   <div class="map-content-area">
-    {{ aposArea({ slug: slug + ":content", area: page.areas.content, edit:edit }) }}
+    {{ aposArea(page, 'content') }}
   </div>
   <ul class="map-locations">
     {{ renderMapLocations(items, page.url, 'map-location') }}

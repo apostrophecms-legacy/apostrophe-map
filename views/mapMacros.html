@@ -40,7 +40,7 @@
     {# Even if you plan to override this link with javascript, it still #}
     {# must exist, otherwise your maps are not Google-friendly. -Tom #}
     <a class="apos-location-list-title" href="{{ item.url }}">{{ item.title | e }}</a>
-    {{ aposArea({ slug: item.slug + ':body', area: item.areas.body }) }}
+    {{ aposArea(item, 'body') }}
 
     <div class="apos-location-list-title">{{ __('Address') }}</div>
     <div class="apos-location-list-description">{{ item.address }}</div>

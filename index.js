@@ -135,7 +135,7 @@ map.Map = function(options, callback) {
   self.beforeSave = function(req, data, snippet, callback) {
     // descr is a denormalized copy of the plaintext part of the body area,
     // for lightweight display in map boxes
-    snippet.descr = self._apos.getAreaPlaintext({ area: snippet.areas.body });
+    snippet.descr = self._apos.getAreaPlaintext({ area: snippet.body });
     self.geocoder.geocodeSnippet(snippet, false, function() {
       return callback(null);
     });
@@ -147,11 +147,7 @@ map.Map = function(options, callback) {
   // produces a huge HTML document
   self._apos.addLocal('aposPruneMapLocations', function(locations) {
     return _.map(locations, function(location) {
-      location = _.pick(location, '_id', 'slug', 'areas', 'title', 'tags', 'address', 'hours', 'url', 'coords', 'descr');
-      if (location.areas) {
-        location.areas = { thumbnail: location.areas.thumbnail };
-      }
-      return location;
+      return _.pick(location, '_id', 'slug', 'thumbnail', 'title', 'tags', 'address', 'hours', 'url', 'coords', 'descr');
     });
   });
 
