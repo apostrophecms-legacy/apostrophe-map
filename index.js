@@ -132,7 +132,7 @@ map.Map = function(options, callback) {
     return self.geocoder;
   };
 
-  self.beforeSave = function(req, data, snippet, callback) {
+  self.beforePutOne = function(req, slug, options, snippet, callback) {
     // descr is a denormalized copy of the plaintext part of the body area,
     // for lightweight display in map boxes
     snippet.descr = self._apos.getAreaPlaintext({ area: snippet.body });
@@ -147,7 +147,7 @@ map.Map = function(options, callback) {
   // produces a huge HTML document
   self._apos.addLocal('aposPruneMapLocations', function(locations) {
     return _.map(locations, function(location) {
-      return _.pick(location, '_id', 'slug', 'thumbnail', 'title', 'tags', 'address', 'hours', 'url', 'coords', 'descr');
+      return _.pick(location, '_id', 'slug', 'thumbnail', 'title', 'tags', 'address', 'hours', 'url', 'geo', 'descr');
     });
   });
 
@@ -158,6 +158,85 @@ map.Map = function(options, callback) {
       self.startGeocoder();
     });
   }
+
+  self._apos.addMigration('addMapGeo', function(callback) {
+    // Don't say type: 'mapLocation' because we want this to work for
+    // subclasses with different instance types too. Instead check the
+    // coords object really carefully
+
+    var needed;
+
+    return self._apos.forEachPage({ coords: { $exists: 1 }, geo: { $exists: 0 } }, function(page, callback) {
+      if (typeof(page.coords) !== 'object') {
+        return callback(null);
+      }
+      // Sorry, Gulf of Guinea
+      if ((!page.coords.lat) || (!page.coords.lng)) {
+        return callback(null);
+      }
+      if (!needed) {
+        needed = true;
+      }
+      return self._apos.pages.update({ _id: page._id }, {
+        $set: {
+          geo: {
+            type: 'Point',
+            coordinates: [ page.coords.lng, page.coords.lat ]
+          }
+        }
+      }, callback);
+    }, callback);
+  });
+
+  var superGet = self.get;
+
+  // The map module's get method supports the following special options:
+  //
+  // options.address: sort by distance from the given address.
+
+  // options.geo: sort by distance from a geoJSON point.
+  // Example: { type: 'Point', coordinates: [ longitude, latitude ] }
+
+  // options.maxMiles, options.maxKm, options.maxDistance:
+  // maximum distance in miles, kilometers or meters respectively.
+
+  self.get = function(req, userCriteria, options, callback) {
+    if (options.address) {
+      if (!options.sort) {
+        options.sort = false;
+      }
+      return self.geocoder.geocode(options.address, function(err, geo) {
+        if (err) {
+          return callback(err);
+        }
+        var _options = _.cloneDeep(options);
+        delete _options.address;
+        _options.geo = geo;
+        return self.get(req, userCriteria, _options, callback);
+      });
+    }
+    if (options.geo) {
+      var near = {
+        $geometry: options.geo
+      };
+      if (options.maxDistance) {
+        near.$maxDistance = options.maxDistance;
+      } else if (options.maxKm) {
+        near.$maxDistance = options.maxKm * 1000;
+      } else if (options.maxMiles) {
+        near.$maxDistance = options.maxMiles * 1609.34;
+      }
+      // Make it safe to modify
+      options = _.cloneDeep(options);
+      var criteria = {
+        geo: { $near: near }
+      };
+      // Use lateCriteria because of this error:
+      // exception: assertion src/mongo/db/query/planner_ixselect.cpp:323
+      options.lateCriteria = criteria;
+    }
+    return superGet(req, userCriteria, options, callback);
+  };
 
   if (callback) {
     process.nextTick(function() {

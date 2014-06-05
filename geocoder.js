@@ -25,7 +25,7 @@ function Geocoder(options) {
   self.geocodePass = function() {
     // Make sure an address exists, otherwise the geocode module will complain in a way
     // that sticks us in a loop trying again with that bad location forever
-    self._apos.pages.find({ type: self._instance, address: { $exists: true, $ne: '' }, $or: [{ coords: { $exists: false }}, { coords: null } ] },
+    self._apos.pages.find({ type: self._instance, address: { $exists: true, $ne: '' }, $or: [{ geo: { $exists: false }}, { geo: null } ] },
       { title: 1, address: 1 }).limit(self._rateLimit).toArray(function(err, snippets) {
       // Use eachSeries to avoid parallelism, the rate limiter below should in theory
       // make this not a problem but I've seen Google get grumpy
@@ -46,6 +46,33 @@ function Geocoder(options) {
     });
   };
 
+  // Geocode an address now. Callback receives an error if
+  // any and a geoJSON point:
+  //
+  // { type: 'point', coordinates: [ longitude, latitude ] }
+
+  self.geocode = function(address, callback) {
+    return geocoder.geocode(address, function(err, geo) {
+      if (err) {
+        return callback(err);
+      }
+      if (geo.status === 'OVER_QUERY_LIMIT') {
+        return callback(new Error(geo.status));
+      } else if (geo.status === 'ZERO_RESULTS') {
+        return callback(new Error(geo.status));
+      } else {
+        if (!(geo.results && geo.results[0])) {
+          return callback(new Error('ZERO_RESULTS'));
+        }
+        var location = geo.results[0].geometry.location;
+        return callback(null, {
+          type: 'Point',
+          coordinates: [ location.lng, location.lat ]
+        });
+      }
+    });
+  };
+
   // Available to be called individually, for instance for manual edits where
   // it is unlikely the rate limit will be reached
   self.geocodeSnippet = function(snippet, saveNow, callback) {
@@ -53,36 +80,43 @@ function Geocoder(options) {
       geocode: function(callback) {
         // If a manually entered location is present, let it win
         if ((typeof(snippet.lat) === 'number') && (typeof(snippet.lng) === 'number')) {
-          snippet.coords = { lat: snippet.lat, lng: snippet.lng };
+          snippet.geo = {
+            type: 'Point',
+            coordinates: [ snippet.lng, snippet.lat ]
+          };
           return callback(null);
         }
-        return geocoder.geocode(snippet.address, function ( err, coords ) {
+        return geocoder.geocode(snippet.address, function ( err, geo ) {
           if (!err) {
-            if (coords.status === 'OVER_QUERY_LIMIT') {
+            if (geo.status === 'OVER_QUERY_LIMIT') {
               // Try again later
-              snippet.coords = null;
+              snippet.geo = null;
               return callback();
-            } else if (coords.status === 'ZERO_RESULTS') {
+            } else if (geo.status === 'ZERO_RESULTS') {
               // Explicitly false so we know it's not a geolocatable address
-              snippet.coords = false;
+              snippet.geo = false;
             } else {
-              if (coords.results && coords.results[0]) {
-                snippet.coords = coords.results[0].geometry.location;
+              if (geo.results && geo.results[0]) {
+                var location = geo.results[0].geometry.location;
+                snippet.geo = {
+                  type: 'Point',
+                  coordinates: [ location.lng, location.lat ]
+                };
               } else {
                 // What the heck Google
-                snippet.coords = null;
+                snippet.geo = null;
               }
             }
           } else {
             // This is an error at the http or node level. Try again later
-            snippet.coords = null;
+            snippet.geo = null;
           }
           return callback(null);
         });
       },
       save: function(callback) {
         if (saveNow) {
-          self._apos.pages.update({ _id: snippet._id }, { $set: { coords: snippet.coords } }, function(err) {
+          self._apos.pages.update({ _id: snippet._id }, { $set: { geo: snippet.geo } }, function(err) {
             // If it didn't work, it'll come up in the next query,
             // no need to report the error now
             return callback(null);

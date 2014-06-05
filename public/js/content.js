@@ -55,7 +55,7 @@ var AposGoogleMap = function(items, id, mapOptions) {
   }
 
   function ifMappable(item, callback) {
-    if (item.coords) {
+    if (item.geo) {
       return callback(item);
     }
   }
@@ -82,8 +82,8 @@ var AposGoogleMap = function(items, id, mapOptions) {
     forEachItem(function(item) {
       ifMappable(item, function(item) {
         ifFiltered(item, function(item) {
-          lat += item.coords.lat;
-          lng += item.coords.lng;
+          lat += item.geo.coordinates[1];
+          lng += item.geo.coordinates[0];
           valid++;
         });
       });
@@ -106,7 +106,7 @@ var AposGoogleMap = function(items, id, mapOptions) {
       ifMappable(item, function(item) {
         ifFiltered(item, function(item) {
           count++;
-          bounds.extend(new google.maps.LatLng(item.coords.lat, item.coords.lng));
+          bounds.extend(new google.maps.LatLng(item.geo.coordinates[1], item.geo.coordinates[0]));
         });
       });
     });
@@ -338,7 +338,7 @@ var AposGoogleMap = function(items, id, mapOptions) {
       var rawCoords = item.address.split(/,\s*/);
       coords = new google.maps.LatLng(parseFloat(rawCoords[0]), parseFloat(rawCoords[1]));
     } else {
-      coords = new google.maps.LatLng(item.coords.lat, item.coords.lng);
+      coords = new google.maps.LatLng(item.geo.coordinates[1], item.geo.coordinates[0]);
     }
 
     var marker = new RichMarker({
