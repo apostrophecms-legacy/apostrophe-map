@@ -167,7 +167,7 @@ map.Map = function(options, callback) {
     var needed;
 
     return self._apos.forEachPage({ coords: { $exists: 1 }, geo: { $exists: 0 } }, function(page, callback) {
-      if (typeof(page.coords) !== 'object') {
+      if ((!page.coords) || (typeof(page.coords) !== 'object')) {
         return callback(null);
       }
       // Sorry, Gulf of Guinea
