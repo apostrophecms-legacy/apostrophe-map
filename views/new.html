@@ -1,0 +1,53 @@
+{% extends 'newBase.html' %}
+
+{% block buttons %}
+  {{ snippetNewControls() }}
+{% endblock %}
+
+{% block topButtons %}
+{% endblock %}
+
+{% block insideForm %}
+
+  {{ snippetAllFields(fields, {before: 'published'} ) }}
+
+	<div class="apos-modal-tabs">
+    <div class="apos-modal-tab-control">
+      <div class="apos-modal-tab-title apos-active" data-tab="groupLocation">
+        Location
+      </div>
+      <div class="apos-modal-tab-title" data-tab="groupDescription">
+        Description
+      </div>
+      <div class="apos-modal-tab-title" data-tab="groupAdmin">
+        Admin
+      </div>
+    </div>
+
+    <div class="apos-modal-tab apos-active" data-tab-id="groupLocation">
+      <div class="apos-modal-tab-content">
+        {{ snippetText('address', 'Address') }}
+        {{ snippetText('hours', 'Hours') }}
+        {{ snippetText('lat', 'Latitude') }}
+        {{ snippetText('lng', 'Longitude') }}
+        <p>{{ __("Latitude and Longitude are optional. Determined automatically from address if not supplied.") }}</p>
+      </div>
+    </div>
+
+    <div class="apos-modal-tab" data-tab-id="groupDescription">
+      <div class="apos-modal-tab-content">
+        {{ snippetSingleton('thumbnail', 'Picture') }}
+        {{ snippetSingleton('body', 'Body') }}
+      </div>
+    </div>
+
+    <div class="apos-modal-tab" data-tab-id="groupAdmin">
+      <div class="apos-modal-tab-content">
+        {{ snippetTags('tags', 'Tags') }}
+        {{ snippetBoolean('published', 'Published') }}
+      </div>
+    </div>
+
+	</div>
+
+{% endblock %}
