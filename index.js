@@ -70,6 +70,39 @@ map.Map = function(options, callback) {
     'hideTitle'
   ].concat(options.removeFields);
 
+  // If somebody REALLY doesn't want to group their fields,
+  // take the hint, otherwise supply a default behavior
+  if (options.groupFields !== false) {
+    options.groupFields = options.groupFields ||
+      // We don't list the title field so it stays on top
+      [
+        {
+          name: 'location',
+          label: 'Location',
+          icon: 'map',
+          fields: [
+            'address', 'hours', 'lat', 'lng'
+          ]
+        },
+        {
+          name: 'description',
+          label: 'Description',
+          icon: 'metadata',
+          fields: [
+            'thumbnail', 'body'
+          ]
+        },
+        {
+          name: 'admin',
+          label: 'admin',
+          icon: 'metadata',
+          fields: [
+            'tags', 'published'
+          ]
+        }
+      ];
+  }
+
   options.modules = (options.modules || []).concat([ { dir: __dirname, name: 'map' } ]);
 
   self._locTypes = options.locTypes;
