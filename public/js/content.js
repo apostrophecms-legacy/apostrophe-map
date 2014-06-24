@@ -275,7 +275,10 @@ var AposGoogleMap = function(items, id, mapOptions) {
   };
 
   self.activateInfoBox = function(item) {
-    if (!item.descr) {
+    // for BC purposes, if an item has no `showInfoBox` property we'll fall
+    // back on the old method of only showing an infoBox when there is no
+    // body content.
+    if ( ((item.showInfoBox === undefined || item.showInfoBox === null) && !item.descr) || item.showInfoBox === false) {
       // No info boxes for items without rich content, such as those
       // supplied for a plain street address associated with an event
       return;
