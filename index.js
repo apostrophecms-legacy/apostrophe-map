@@ -63,6 +63,13 @@ map.Map = function(options, callback) {
       type: 'float',
       def: null,
       help: 'Optional. Determined automatically from address if not supplied.'
+    },
+    {
+      name: 'showInfoBox',
+      label: 'Show Info Box on Map',
+      type: 'boolean',
+      def: true,
+      help: 'Show extended info for this item when it is clicked on within a Google Map.'
     }
   ].concat(options.addFields || []);
 
@@ -180,7 +187,7 @@ map.Map = function(options, callback) {
   // produces a huge HTML document
   self._apos.addLocal('aposPruneMapLocations', function(locations) {
     return _.map(locations, function(location) {
-      return _.pick(location, '_id', 'slug', 'thumbnail', 'title', 'tags', 'address', 'hours', 'url', 'geo', 'descr');
+      return _.pick(location, '_id', 'slug', 'thumbnail', 'title', 'tags', 'address', 'hours', 'url', 'geo', 'descr', 'showInfoBox');
     });
   });
 
