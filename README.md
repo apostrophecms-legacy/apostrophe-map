@@ -41,7 +41,6 @@ AWESOME NEW OPTIONS
 
 The "get" method of the maps module now accepts these options, in addition to everything `snippets.get` and `pages.get` will accept:
 
-
 `geo`: a GeoJSON point. When this option is passed, results are sorted by distance from this point.
 
 `maxDistance`: results are restricted to points within this many meters of "geo".
