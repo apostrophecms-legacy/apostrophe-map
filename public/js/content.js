@@ -25,6 +25,7 @@ var AposGoogleMap = function(items, id, mapOptions) {
   self.filterBy = mapOptions.filterBy || 'all';
 
   function filter(filterBy) {
+    console.log(filterBy);
     self.filterBy = filterBy;
     forEachItem(function(item) {
       ifMappable(item, function(item) {
@@ -65,11 +66,10 @@ var AposGoogleMap = function(items, id, mapOptions) {
       if (self.filterBy === 'all') {
         return callback(item);
       } else {
+        var filterBy = (_.isArray(self.filterBy)) ? self.filterBy : [self.filterBy];
         var marker = item.marker;
-        for (var t in marker.locTypes) {
-          if (marker.locTypes[t] == self.filterBy) {
-            return callback(item);
-          }
+        if( _.intersection(self.filterBy, item.tags).length ) {
+          return callback(item);
         }
       }
     });
@@ -268,7 +268,17 @@ var AposGoogleMap = function(items, id, mapOptions) {
 
       // Create a jQuery event that can be used to filter by
       // a particular tag or 'all'
-      $(mapEl).on('filter', function(e, filterBy) {
+      $(mapEl).on('filter', function(e) {
+        // grab any arguments after the first (the event object),
+        // which represent one or more tags to filter by.
+        // we need to do this because calling .trigger('filter', Array)
+        // passes the array items as arguments, instead of as an array.
+        var filterBy = Array.prototype.slice.call(arguments, 1);
+        // if the only argument supplied is the string "all",
+        // pass it through as a string.
+        if(filterBy.length == 1 && filterBy[0] == 'all') {
+          filterBy = 'all';
+        }
         return filter(filterBy);
       });
     }
