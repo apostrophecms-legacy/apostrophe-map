@@ -150,10 +150,13 @@ var AposGoogleMap = function(items, id, mapOptions) {
     // Geocode an item if needed
     function geocodeOne(i, callback) {
       var item = self.items[i];
-      if ((!item.coords) && (item.address)) {
+      if ((!item.geo) && (item.address)) {
         geocoder.geocode( { 'address': self.items[i].address }, function(results, status) {
           if (status == google.maps.GeocoderStatus.OK) {
-            item.coords = { lat: results[0].geometry.location.lat(), lng: results[0].geometry.location.lng() };
+            item.geo = {
+              type: 'Point',
+              coordinates: [ results[0].geometry.location.lng(), results[0].geometry.location.lat() ]
+            };
             return callback();
           } else {
             return callback();
@@ -247,7 +250,7 @@ var AposGoogleMap = function(items, id, mapOptions) {
       }
 
       function setUpItem(item) {
-        if (!item.coords) {
+        if (!item.geo) {
           // Ignore ungeocoded points
           return;
         }
