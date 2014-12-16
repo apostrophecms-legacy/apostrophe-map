@@ -46,3 +46,8 @@ The "get" method of the maps module now accepts these options, in addition to ev
 `maxDistance`: results are restricted to points within this many meters of "geo".
 `maxKm`: same for kilometers.
 `maxMiles`: same for miles.
+
+DYNAMIC LOADING
+
+You no longer need to add script tags for the Google Maps API to your `base.html` file. Instead, these dynamically load on their own, and only when they are actually needed.
+
