@@ -28,9 +28,13 @@ function Geocoder(options) {
     self._apos.pages.find({ type: self._instance, address: { $exists: true, $ne: '' }, $or: [{ coords: { $exists: false }}, { coords: null } ] },
       { title: 1, address: 1 }).limit(self._rateLimit).toArray(function(err, snippets) {
       // Use eachSeries to avoid parallelism, the rate limiter below should in theory
-      // make this not a problem but I've seen Google get grumpy
+      // make this not a problem but I've seen Google get grumpy.
       async.eachSeries(snippets || [], geocodeSnippet, function(err) {
-        setTimeout(self.geocodePass, 1000.0);
+        // Don't invoke passes so ferociously often, and
+        // introduce randomness to deal more gracefully
+        // with situations where many Apostrophe instances
+        // are talking to MongoDB
+        setTimeout(self.geocodePass, 10000 + Math.random() * 5000);
       });
 
       function geocodeSnippet(snippet, callback) {
