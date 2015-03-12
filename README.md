@@ -1,13 +1,47 @@
-apostrophe-map
-==============
+# apostrophe-map
 
 `apostrophe-map` adds interactive maps to the [Apostrophe](http://github.com/punkave/apostrophe) content management system. `apostrophe-map` provides both backend and frontend components, including a friendly UI built on Apostrophe's rich content editing features.
 
 See the `apostrophe-sandbox` project for a demo of usage. Setup is similar to `apostrophe-blog` or `apostrophe-snippets`. The geocoder is automatically started.
 
-If you are running in a multiple-process environment, like `cluster`, you should set the `startGeocoder` option to `false` and explicitly invoke the `startGeocoder` method from one and only one process to avoid hitting API rate limits.
+## Special map-related options to the `get` method
 
-## Update: GeoJSON, address search and a bc break
+The "get" method of the maps module accepts these options, in addition to everything `snippets.get` and `pages.get` will accept:
+
+`geo`: a GeoJSON point. When this option is passed, results are sorted by distance from this point.
+
+`maxDistance`: results are restricted to points within this many meters of "geo".
+`maxKm`: same for kilometers.
+`maxMiles`: same for miles.
+
+## Subclassing the map
+
+The map module's browser-side JavaScript can now be easily subclassed and extended.
+
+Prior to 3/12/15 this was very difficult due to the timing of the way the map object was constructed.
+
+Here is an example of code that overrides the method that generates an info box:
+
+```javascript
+// This code lives at your project level, in
+// lib/modules/apostrophe-map/public/js/content.js
+
+var superAposGoogleMap = AposGoogleMap;
+
+AposGoogleMap = function(item, id, mapOptions) {
+  var self = this;
+  superAposGoogleMap.call(self, item, id, mapOptions);
+  self.activateInfoBox = function(item) {
+    alert('Do this instead of displaying the info box');
+  };
+};
+```
+
+Note the use of the "super pattern," much as we do on the server side when extending methods of Apostrophe modules.
+
+You'll find that the browser-side code in `content.js` has been broken down into many individual methods, all of which can be easily overridden in this way.
+
+## bc break, June 5th, 2014: GeoJSON, map locations and your JavaScript
 
 We've made a change to the way the map module stores coordinates. This change enables the use of a 2dsphere index for fast searches for addresses and other locations. And we've introduced cool options that leverage that. But, there's a bc break required.
 
@@ -37,17 +71,8 @@ coords = new google.maps.LatLng(item.geo.coordinates[1], item.geo.coordinates[0]
 
 The `.coords` property in old sites will hang around, because it's not hurting anyone and migrations should be as gentle as possible. But it won't be updated anymore, so don't be fooled.
 
-AWESOME NEW OPTIONS
-
-The "get" method of the maps module now accepts these options, in addition to everything `snippets.get` and `pages.get` will accept:
-
-`geo`: a GeoJSON point. When this option is passed, results are sorted by distance from this point.
-
-`maxDistance`: results are restricted to points within this many meters of "geo".
-`maxKm`: same for kilometers.
-`maxMiles`: same for miles.
-
-DYNAMIC LOADING
+## Dynamic loading
 
 You no longer need to add script tags for the Google Maps API to your `base.html` file. Instead, these dynamically load on their own, and only when they are actually needed.
 
+Older `base.html` files that do load these scripts the hard way will still work, but you are slowing your users down on every page, so stop doing that.
