@@ -186,9 +186,10 @@ map.Map = function(options, callback) {
   // Prunes map locations for use in the actual map. Sending all the data
   // produces a huge HTML document
   self._apos.addLocal('aposPruneMapLocations', function(locations) {
-    return _.map(locations, function(location) {
+    var result = _.map(locations, function(location) {
       return _.pick(location, '_id', 'slug', 'thumbnail', 'title', 'tags', 'address', 'hours', 'url', 'geo', 'descr', 'showInfoBox');
     });
+    return result;
   });
 
   if (options.startGeocoder !== false) {
