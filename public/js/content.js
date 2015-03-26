@@ -56,7 +56,7 @@ window.AposGoogleMap = function(items, id, mapOptions) {
         };
         // apos.log('maps: dynamically loading google maps API');
         // Google will call aposGoogleMapApiReady for us
-        self.addScript('https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&' +
+        self.addScript('https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places,geometry&' +
             'key=AIzaSyA4AeSmhph6FqLD7GKnjP5aQLiySYzmuQs&sensor=false&callback=aposGoogleMapApiReady');
       }
     };
@@ -390,12 +390,16 @@ window.AposGoogleMap = function(items, id, mapOptions) {
           if (item.infoBox) {
             item.infoBox.close();
           }
-          item.marker.setVisible(false);
+          if (item.marker) {
+            item.marker.setVisible(false);
+          }
         });
       });
       self.forEachItem(function(item) {
         self.ifFiltered(item, function(item) {
-          item.marker.setVisible(true);
+          if (item.marker) {
+            item.marker.setVisible(true);
+          }
         });
       });
 
