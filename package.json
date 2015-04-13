@@ -20,11 +20,11 @@
   "author": "P'unk Avenue LLC",
   "license": "MIT",
   "dependencies": {
-    "async": "0.8.x",
-    "lodash": "2.4.x",
-    "extend": "~1.1.3",
     "apostrophe-snippets": "0.5.x",
-    "geocoder": "git://github.com/punkave/geocoder.git",
-    "limiter": "~1.0.3"
+    "async": "0.8.x",
+    "extend": "~1.1.3",
+    "geocoder": "~0.2.2",
+    "limiter": "~1.0.3",
+    "lodash": "2.4.x"
   }
 }
