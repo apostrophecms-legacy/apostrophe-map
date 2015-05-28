@@ -56,7 +56,7 @@ window.AposGoogleMap = function(items, id, mapOptions) {
         };
         // apos.log('maps: dynamically loading google maps API');
         // Google will call aposGoogleMapApiReady for us
-        self.addScript('https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places,geometry&' +
+        self.addScript('//maps.googleapis.com/maps/api/js?v=3.exp&libraries=places,geometry&' +
             'key=AIzaSyA4AeSmhph6FqLD7GKnjP5aQLiySYzmuQs&sensor=false&callback=aposGoogleMapApiReady');
       }
     };
@@ -70,11 +70,11 @@ window.AposGoogleMap = function(items, id, mapOptions) {
 
       var load = self.mapOptions.googleCodeLibraries || [
         {
-          src: 'http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js',
+          src: '//google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js',
           defines: 'InfoBox'
         },
         {
-          src: 'http://google-maps-utility-library-v3.googlecode.com/svn/trunk/richmarker/src/richmarker-compiled.js',
+          src: '//google-maps-utility-library-v3.googlecode.com/svn/trunk/richmarker/src/richmarker-compiled.js',
           defines: 'RichMarker'
         }
       ];
@@ -373,7 +373,7 @@ window.AposGoogleMap = function(items, id, mapOptions) {
           width: "280px"
          },
         closeBoxMargin: "0px 0px 0px 0px",
-        closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
+        closeBoxURL: "//www.google.com/intl/en_us/mapfiles/close.gif",
         infoBoxClearance: new google.maps.Size(1, 1),
         pane: "floatPane",
         enableEventPropagation: false
