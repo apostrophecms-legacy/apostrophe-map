@@ -70,11 +70,11 @@ window.AposGoogleMap = function(items, id, mapOptions) {
 
       var load = self.mapOptions.googleCodeLibraries || [
         {
-          src: 'http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js',
+          src: apos.data.prefix + '/modules/map/js/vendor/infobox.js',
           defines: 'InfoBox'
         },
         {
-          src: 'http://google-maps-utility-library-v3.googlecode.com/svn/trunk/richmarker/src/richmarker-compiled.js',
+          src: apos.data.prefix + '/modules/map/js/vendor/richmarker-compiled.js',
           defines: 'RichMarker'
         }
       ];
