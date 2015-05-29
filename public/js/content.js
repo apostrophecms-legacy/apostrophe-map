@@ -373,7 +373,7 @@ window.AposGoogleMap = function(items, id, mapOptions) {
           width: "280px"
          },
         closeBoxMargin: "0px 0px 0px 0px",
-        closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
+        closeBoxURL: "//www.google.com/intl/en_us/mapfiles/close.gif",
         infoBoxClearance: new google.maps.Size(1, 1),
         pane: "floatPane",
         enableEventPropagation: false
