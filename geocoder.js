@@ -25,7 +25,7 @@ function Geocoder(options) {
   self.geocodePass = function() {
     // Make sure an address exists, otherwise the geocode module will complain in a way
     // that sticks us in a loop trying again with that bad location forever
-    self._apos.pages.find({ type: self._instance, address: { $exists: true, $ne: '' }, $or: [{ geo: { $exists: false }}, { geo: null } ] },
+    self._apos.pages.find({ type: self._instance, address: { $exists: true, $ne: '' }, geoInvalidAddress: { $ne: true }, $or: [{ geo: { $exists: false }}, { geo: null } ] },
       { title: 1, address: 1 }).limit(self._rateLimit).toArray(function(err, snippets) {
       // Use eachSeries to avoid parallelism, the rate limiter below should in theory
       // make this not a problem but I've seen Google get grumpy.
@@ -84,6 +84,7 @@ function Geocoder(options) {
       geocode: function(callback) {
         // If a manually entered location is present, let it win
         if ((typeof(snippet.lat) === 'number') && (typeof(snippet.lng) === 'number')) {
+          snippet.geoInvalidAddress = false;
           snippet.geo = {
             type: 'Point',
             coordinates: [ snippet.lng, snippet.lat ]
@@ -91,14 +92,16 @@ function Geocoder(options) {
           return callback(null);
         }
         return geocoder.geocode(snippet.address, function ( err, geo ) {
+          err = null;
           if (!err) {
             if (geo.status === 'OVER_QUERY_LIMIT') {
               // Try again later
               snippet.geo = null;
+              snippet.geoInvalidAddress = false;
               return callback();
             } else if (geo.status === 'ZERO_RESULTS') {
-              // Explicitly false so we know it's not a geolocatable address
-              snippet.geo = false;
+              snippet.geoInvalidAddress = true;
+              snippet.geo = null;
             } else {
               if (geo.results && geo.results[0]) {
                 var location = geo.results[0].geometry.location;
@@ -106,9 +109,11 @@ function Geocoder(options) {
                   type: 'Point',
                   coordinates: [ location.lng, location.lat ]
                 };
+                snippet.geoInvalidAddress = false;
               } else {
                 // What the heck Google
                 snippet.geo = null;
+                snippet.geoInvalidAddress = false;
               }
             }
           } else {
@@ -120,7 +125,7 @@ function Geocoder(options) {
       },
       save: function(callback) {
         if (saveNow) {
-          self._apos.pages.update({ _id: snippet._id }, { $set: { geo: snippet.geo } }, function(err) {
+          self._apos.pages.update({ _id: snippet._id }, { $set: { geo: snippet.geo, geoInvalidAddress: snippet.geoInvalidAddress } }, function(err) {
             // If it didn't work, it'll come up in the next query,
             // no need to report the error now
             return callback(null);
