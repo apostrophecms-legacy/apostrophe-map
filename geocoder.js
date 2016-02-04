@@ -93,7 +93,7 @@ function Geocoder(options) {
         }
         return geocoder.geocode(snippet.address, function ( err, geo ) {
           err = null;
-          if (!err) {
+          if (!err && geo) {
             if (geo.status === 'OVER_QUERY_LIMIT') {
               // Try again later
               snippet.geo = null;
