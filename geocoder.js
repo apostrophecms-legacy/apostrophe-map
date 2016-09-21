@@ -57,22 +57,19 @@ function Geocoder(options) {
   // { type: 'point', coordinates: [ longitude, latitude ] }
 
   self.geocode = function(address, callback) {
-    console.log('geocoding: ' + address);
     return self._nodeGeocoder.geocode(address, function(err, geo) {
       if (err) {
-        console.log('error: ', err);
+        console.error('geocoding error: ', err);
         return callback(err);
       }
       if (!geo) {
-        console.log('invalid response');
+        console.error('geocoding problem: invalid response');
         return callback(new Error('Invalid response'));
       }
       if (!geo.length) {
-        console.log('no location');
         // No location was found (?)
         return callback(null, null);
       }
-      console.log('point returned');
       var location = geo[0];
       return callback(null, {
         type: 'Point',
