@@ -76,3 +76,10 @@ The `.coords` property in old sites will hang around, because it's not hurting a
 You no longer need to add script tags for the Google Maps API to your `base.html` file. Instead, these dynamically load on their own, and only when they are actually needed.
 
 Older `base.html` files that do load these scripts the hard way will still work, but you are slowing your users down on every page, so stop doing that.
+
+## Configuring the geocoder
+
+You may pass configuration to the `node-geocoder` npm module used to look up addresses via the `geocoder` option to the `apostrophe-maps` module. The default geocoding provider is Google. You will need to configure the `apiKey` property for domains that have not used the Google Maps API before.
+
+In addition, the `dailyLimit` and `rateLimit` properties of the `geocoder` option can be used to limit the queries per day and per second, respectively. These default to `2500` and `10` to stay on the good side of Google's free API limits.
+
