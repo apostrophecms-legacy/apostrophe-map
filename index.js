@@ -196,7 +196,7 @@ map.Map = function(options, callback) {
     process.nextTick(function() {
       // Start the geocoder on next tick, so that it can be
       // overridden in subclasses
-      self.startGeocoder();
+      self.startGeocoder(options.geocoder || {});
     });
   }
 

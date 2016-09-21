@@ -1,4 +1,4 @@
-var geocoder = require('geocoder');
+var nodeGeocoder = require('node-geocoder');
 var RateLimiter = require('limiter').RateLimiter;
 var async = require('async');
 
@@ -8,6 +8,7 @@ module.exports = function(options) {
 
 function Geocoder(options) {
   var self = this;
+  self._nodeGeocoder = nodeGeocoder(options || {});
   // Google's standard free limits
   self._dailyLimit = options.dailyLimit || 2500;
   self._rateLimit = options.rateLimit || 10;
@@ -56,30 +57,34 @@ function Geocoder(options) {
   // { type: 'point', coordinates: [ longitude, latitude ] }
 
   self.geocode = function(address, callback) {
-    return geocoder.geocode(address, function(err, geo) {
+    console.log('geocoding: ' + address);
+    return self._nodeGeocoder.geocode(address, function(err, geo) {
       if (err) {
+        console.log('error: ', err);
         return callback(err);
       }
-      if (geo.status === 'OVER_QUERY_LIMIT') {
-        return callback(new Error(geo.status));
-      } else if (geo.status === 'ZERO_RESULTS') {
-        return callback(new Error(geo.status));
-      } else {
-        if (!(geo.results && geo.results[0])) {
-          return callback(new Error('ZERO_RESULTS'));
-        }
-        var location = geo.results[0].geometry.location;
-        return callback(null, {
-          type: 'Point',
-          coordinates: [ location.lng, location.lat ]
-        });
+      if (!geo) {
+        console.log('invalid response');
+        return callback(new Error('Invalid response'));
       }
+      if (!geo.length) {
+        console.log('no location');
+        // No location was found (?)
+        return callback(null, null);
+      }
+      console.log('point returned');
+      var location = geo[0];
+      return callback(null, {
+        type: 'Point',
+        coordinates: [ location.longitude, location.latitude ]
+      });
     });
   };
 
   // Available to be called individually, for instance for manual edits where
   // it is unlikely the rate limit will be reached
   self.geocodeSnippet = function(snippet, saveNow, callback) {
+    snippet.geo = null;
     return async.series({
       geocode: function(callback) {
         // If a manually entered location is present, let it win
@@ -91,34 +96,18 @@ function Geocoder(options) {
           };
           return callback(null);
         }
-        return geocoder.geocode(snippet.address, function ( err, geo ) {
-          err = null;
-          if (!err && geo) {
-            if (geo.status === 'OVER_QUERY_LIMIT') {
-              // Try again later
-              snippet.geo = null;
-              snippet.geoInvalidAddress = false;
-              return callback();
-            } else if (geo.status === 'ZERO_RESULTS') {
-              snippet.geoInvalidAddress = true;
-              snippet.geo = null;
-            } else {
-              if (geo.results && geo.results[0]) {
-                var location = geo.results[0].geometry.location;
-                snippet.geo = {
-                  type: 'Point',
-                  coordinates: [ location.lng, location.lat ]
-                };
-                snippet.geoInvalidAddress = false;
-              } else {
-                // What the heck Google
-                snippet.geo = null;
-                snippet.geoInvalidAddress = false;
-              }
-            }
-          } else {
-            // This is an error at the http or node level. Try again later
+        return self.geocode(snippet.address, function(err, geo) {
+          if (err) {
+            // Who knows? Usually rate limiting. Hard to tell with an API that makes it
+            // hard to catch things with any nuance. Try again later
             snippet.geo = null;
+            return callback(null);
+          }
+          if (!geo) {
+            snippet.geoInvalidAddress = true;
+          } else {
+            snippet.geoInvalidAddress = false;
+            snippet.geo = geo;
           }
           return callback(null);
         });
