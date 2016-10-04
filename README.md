@@ -1,3 +1,7 @@
+## Deprecated for new sites
+
+This module was for A2 0.5.x. For new projects, use the [apostrophe-places module](http://npmjs.org/package/apostrophe-places).
+
 # apostrophe-map
 
 `apostrophe-map` adds interactive maps to the [Apostrophe](http://github.com/punkave/apostrophe) content management system. `apostrophe-map` provides both backend and frontend components, including a friendly UI built on Apostrophe's rich content editing features.
@@ -82,4 +86,3 @@ Older `base.html` files that do load these scripts the hard way will still work,
 You may pass configuration to the `node-geocoder` npm module used to look up addresses via the `geocoder` option to the `apostrophe-maps` module. The default geocoding provider is Google. You will need to configure the `apiKey` property for domains that have not used the Google Maps API before.
 
 In addition, the `dailyLimit` and `rateLimit` properties of the `geocoder` option can be used to limit the queries per day and per second, respectively. These default to `2500` and `10` to stay on the good side of Google's free API limits.
-
