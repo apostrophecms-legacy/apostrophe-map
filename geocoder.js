@@ -58,7 +58,7 @@ function Geocoder(options) {
   //
   // { type: 'point', coordinates: [ longitude, latitude ] }
   //
-  // Check the cache first
+  // Checks the cache first
 
   self.geocode = function(address, callback) {
 

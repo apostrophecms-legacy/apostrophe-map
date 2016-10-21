@@ -272,9 +272,7 @@ map.Map = function(options, callback) {
       var criteria = {
         geo: { $near: near }
       };
-      // "$near can't be inside another $ operator", so we can't use
-      // self.and() normally.
-      self.addLateCriteria(criteria);
+      options.lateCriteria = criteria;
     }
     return superGet(req, userCriteria, options, callback);
   };
