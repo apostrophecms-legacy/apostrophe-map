@@ -272,9 +272,9 @@ map.Map = function(options, callback) {
       var criteria = {
         geo: { $near: near }
       };
-      // Use lateCriteria because of this error:
-      // exception: assertion src/mongo/db/query/planner_ixselect.cpp:323
-      options.lateCriteria = criteria;
+      // "$near can't be inside another $ operator", so we can't use
+      // self.and() normally.
+      self.addLateCriteria(criteria);
     }
     return superGet(req, userCriteria, options, callback);
   };

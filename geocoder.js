@@ -14,6 +14,8 @@ function Geocoder(options) {
   self._rateLimit = options.rateLimit || 10;
   self._instance = options.instance;
   self._apos = options.apos;
+  self.cacheLifetime = options.cacheLifetime || 86400;
+  self.cache = self._apos.getCache('apostrophe-map-geocoder');
 
   var dayLimiter = new RateLimiter(self._dailyLimit, 'day');
   var secondLimiter = new RateLimiter(self._rateLimit, 'second');
@@ -55,27 +57,54 @@ function Geocoder(options) {
   // any and a geoJSON point:
   //
   // { type: 'point', coordinates: [ longitude, latitude ] }
+  //
+  // Check the cache first
 
   self.geocode = function(address, callback) {
-    return self._nodeGeocoder.geocode(address, function(err, geo) {
+
+    var location;
+
+    return self.cache.get(address, function(err, value) {
       if (err) {
-        console.error('geocoding error: ', err);
         return callback(err);
       }
-      if (!geo) {
-        console.error('geocoding problem: invalid response');
-        return callback(new Error('Invalid response'));
+      if (value) {
+        return callback(null, value);
       }
-      if (!geo.length) {
-        // No location was found (?)
-        return callback(null, null);
-      }
-      var location = geo[0];
-      return callback(null, {
-        type: 'Point',
-        coordinates: [ location.longitude, location.latitude ]
-      });
+      return fetch();
     });
+    
+    function fetch() {
+      return self._nodeGeocoder.geocode(address, function(err, geo) {
+        if (err) {
+          console.error('geocoding error: ', err);
+          return callback(err);
+        }
+        if (!geo) {
+          console.error('geocoding problem: invalid response');
+          return callback(new Error('Invalid response'));
+        }
+        if (!geo.length) {
+          // No location was found (?)
+          return callback(null, null);
+        }
+        var googlePoint = geo[0];
+        location = {
+          type: 'Point',
+          coordinates: [ googlePoint.longitude, googlePoint.latitude ]
+        };
+        return insert();
+      });
+    }
+    
+    function insert() {
+      return self.cache.set(address, location, self.cacheLifetime, function(err) {
+        if (err) {
+          return callback(err);
+        }
+        return callback(null, location);
+      });
+    }
   };
 
   // Available to be called individually, for instance for manual edits where

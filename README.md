@@ -86,3 +86,7 @@ Older `base.html` files that do load these scripts the hard way will still work,
 You may pass configuration to the `node-geocoder` npm module used to look up addresses via the `geocoder` option to the `apostrophe-maps` module. The default geocoding provider is Google. You will need to configure the `apiKey` property for domains that have not used the Google Maps API before.
 
 In addition, the `dailyLimit` and `rateLimit` properties of the `geocoder` option can be used to limit the queries per day and per second, respectively. These default to `2500` and `10` to stay on the good side of Google's free API limits.
+
+## Caching
+
+To minimize times when you bash into Google's rate limit when rapidly testing in development, Geolocation results are cached for one day. There is very little downside to this (addresses don't move around very much), but you can set the cache lifetime in seconds as `{geocoder: { cacheLifetime: 86400 } }`. The default is one day (86,400 seconds).
