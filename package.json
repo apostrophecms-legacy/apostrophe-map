@@ -1,6 +1,6 @@
 {
   "name": "apostrophe-map",
-  "version": "0.5.31",
+  "version": "0.5.32",
   "description": "Custom Google map generator for the Apostrophe content management system",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:punkave/apostrophe-map.git"
+    "url": "git@github.com:apostrophecms-legacy/apostrophe-map.git"
   },
   "keywords": [
     "map",
