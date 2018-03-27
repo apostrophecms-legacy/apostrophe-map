@@ -228,7 +228,7 @@ window.AposGoogleMap = function(items, id, mapOptions) {
     // Geocode an item if needed
     self.geocodeOne = function(item, callback) {
       if ((!item.geo) && (item.address)) {
-        geocoder.geocode( { 'address': item.address }, function(results, status) {
+        self.geocoder.geocode( { 'address': item.address }, function(results, status) {
           if (status == google.maps.GeocoderStatus.OK) {
             item.geo = {
               type: 'Point',
@@ -501,4 +501,3 @@ window.AposGoogleMap = function(items, id, mapOptions) {
     };
   }
 };
-
