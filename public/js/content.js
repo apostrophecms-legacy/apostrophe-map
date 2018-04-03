@@ -407,7 +407,7 @@ window.AposGoogleMap = function(items, id, mapOptions) {
     };
 
     self.focusAfterFilter = function() {
-      if (filterBy == 'all') {
+      if (self.filterBy === 'all') {
         self.resetZoom();
         self.resetCenter();
       } else {
